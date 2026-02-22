@@ -400,7 +400,7 @@ function CreateDrawing(drawType, properties)
                     PointC = C;
                     PointD = D;
                     Filled = false;
-                    Thickness = drawing.data.Thickness or 1;
+                    Thickness = 1;
                 })
             end
         end
