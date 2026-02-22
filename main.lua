@@ -418,29 +418,33 @@ function CreateDrawing(drawType, properties)
         ScreenPoints = RectCorners
 
         if drawing.visible then
-            -- Filled Square
-            local Main = AddDrawing("Square", {
+            -- Filled Quad
+            local Main = AddDrawing("Quad", {
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 1;
                 Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 0;
                 Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-                --Square
-                Size = Size;
-                Position = Pos;
+                --Quad
+                PointA = ScreenPoints.TopRight;
+                PointB = ScreenPoints.TopLeft;
+                PointC = ScreenPoints.BottomLeft;
+                PointD = ScreenPoints.BottomRight;
                 Thickness = 3;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
             })
-            -- Outline Square
-            local Outline = AddDrawing("Square", {
+            -- Outline Quad
+            local Outline = AddDrawing("Quad", {
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 2;
                 Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-                --Square
-                Size = Size;
-                Position = Pos;
+                --Quad
+                PointA = ScreenPoints.TopRight;
+                PointB = ScreenPoints.TopLeft;
+                PointC = ScreenPoints.BottomLeft;
+                PointD = ScreenPoints.BottomRight;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
                 Filled = false;
             })
@@ -464,10 +468,10 @@ function CreateDrawing(drawType, properties)
                 Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 0;
                 Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Quad
-                PointA = ScreenPoints.TopLeft;
-                PointB = ScreenPoints.TopRight;
-                PointC = ScreenPoints.BottomRight;
-                PointD = ScreenPoints.BottomLeft;
+                PointA = ScreenPoints.TopRight;
+                PointB = ScreenPoints.TopLeft;
+                PointC = ScreenPoints.BottomLeft;
+                PointD = ScreenPoints.BottomRight;
                 Thickness = 3;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
             })
@@ -479,10 +483,10 @@ function CreateDrawing(drawType, properties)
                 Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Quad
-                PointA = ScreenPoints.TopLeft;
-                PointB = ScreenPoints.TopRight;
-                PointC = ScreenPoints.BottomRight;
-                PointD = ScreenPoints.BottomLeft;
+                PointA = ScreenPoints.TopRight;
+                PointB = ScreenPoints.TopLeft;
+                PointC = ScreenPoints.BottomLeft;
+                PointD = ScreenPoints.BottomRight;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
                 Filled = false;
             })
