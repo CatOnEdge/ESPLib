@@ -628,12 +628,8 @@ function CreateDrawing(drawType, properties)
                 OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             })
 
-            print(text)
-            local drawingproperties = {}
-            for i, v in pairs(text) do
-                drawingproperties[i] = v
-            end
-            print(repr(drawingproperties), reprSettings)
+            print("text.TextBounds", text.TextBounds)
+            print("text.Position", text.Position)
 
             ScreenPoints = {
                 Pos + Vector2.new(-text.TextBounds.X/2, -text.TextBounds.X/2);
