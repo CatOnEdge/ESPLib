@@ -132,15 +132,15 @@ function GetBox3DCorners(cf: CFrame, size: Vector3)
     local hx, hy, hz = size.X/2, size.Y/2, size.Z/2
 
     local offsets = {
-        Vector3.new(-hx, -hy, -hz),
-        Vector3.new(-hx, -hy,  hz),
-        Vector3.new(-hx,  hy, -hz),
-        Vector3.new(-hx,  hy,  hz),
+        [1] = Vector3.new(-hx, -hy, -hz),
+        [2] = Vector3.new(-hx, -hy,  hz),
+        [3] = Vector3.new(-hx,  hy, -hz),
+        [4] = Vector3.new(-hx,  hy,  hz),
 
-        Vector3.new( hx, -hy, -hz),
-        Vector3.new( hx, -hy,  hz),
-        Vector3.new( hx,  hy, -hz),
-        Vector3.new( hx,  hy,  hz),
+        [5] = Vector3.new( hx, -hy, -hz),
+        [6] = Vector3.new( hx, -hy,  hz),
+        [7] = Vector3.new( hx,  hy, -hz),
+        [8] = Vector3.new( hx,  hy,  hz),
     }
 
     local corners = {}
@@ -290,12 +290,12 @@ BOX_3D_EDGES = {
 
 BOX_3D_FACES = {
     -- Each face is 4 indices into the corners array
-    {1,2,4,3}, -- Left
+    {1,3,4,2}, -- Left
     {5,6,8,7}, -- Right
-    {1,5,6,2}, -- Bottom
-    {3,4,8,7}, -- Top
-    {1,3,7,5}, -- Front
-    {2,6,8,4}, -- Back
+    {1,2,6,5}, -- Bottom
+    {3,7,8,4}, -- Top
+    {1,5,7,3}, -- Front
+    {2,4,8,6}, -- Back
 }
 
 QUAD_2D_EDGES = {
@@ -383,7 +383,7 @@ function CreateDrawing(drawType, properties)
                         PointB = B;
                         PointC = C;
                         PointD = D;
-                        Filled = drawing.data.Filled or true;
+                        Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
                         Thickness = 1;
                     })
                     -- Outline Quad
