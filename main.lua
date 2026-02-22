@@ -91,39 +91,44 @@ function RoundUp(n: number): number
 end
 ESP.RoundUp = RoundUp
 
-function GetBox3DCorners(cf: CFrame, size: Vector3)
-    local hx, hy, hz = size.X/2, size.Y/2, size.Z/2
+function GetScreenBounds(points)
+    local minX, minY = math.huge, math.huge
+    local maxX, maxY = -math.huge, -math.huge
 
-    local offsets = {
-        Vector3.new(-hx, -hy, -hz),
-        Vector3.new(-hx, -hy,  hz),
-        Vector3.new(-hx,  hy, -hz),
-        Vector3.new(-hx,  hy,  hz),
-
-        Vector3.new( hx, -hy, -hz),
-        Vector3.new( hx, -hy,  hz),
-        Vector3.new( hx,  hy, -hz),
-        Vector3.new( hx,  hy,  hz),
-    }
-
-    local corners = {}
-    for i = 1, 8 do
-        corners[i] = cf * offsets[i]
+    for _, p in ipairs(points) do
+        if p.X < minX then minX = p.X end
+        if p.Y < minY then minY = p.Y end
+        if p.X > maxX then maxX = p.X end
+        if p.Y > maxY then maxY = p.Y end
     end
 
-    return corners
+    return minX, minY, maxX, maxY
 end
 
-function GetRect2DCorners(p1: Vector2, p2: Vector2)
+function GetRect2DAnchors(points)
+    local minX, minY, maxX, maxY = GetScreenBounds(points)
+
+    local centerX = (minX + maxX) * 0.5
+    local centerY = (minY + maxY) * 0.5
+
     return {
-        p1;
-        Vector2.new(p1.X, p2.Y);
-        p2;
-        Vector2.new(p2.X, p1.Y);
+        Center = Vector2.new(centerX, centerY);
+
+        TopLeft = Vector2.new(minX, maxY);
+        Top = Vector2.new(centerX, maxY);
+        TopRight = Vector2.new(maxX, maxY);
+
+        BottomLeft = Vector2.new(minX, minY);
+        Bottom = Vector2.new(centerX, minY);
+        BottomRight = Vector2.new(maxX, minY);
+
+        Left = Vector2.new(minX, centerY);
+        Right = Vector2.new(maxX, centerY);
     }
 end
 
-function GetRect3DCorners(cf: CFrame, size: Vector3)
+function GetBox3DCorners(cf: CFrame, size: Vector3)
+    local Camera = workspace.CurrentCamera
     local hx, hy, hz = size.X/2, size.Y/2, size.Z/2
 
     local offsets = {
@@ -143,7 +148,50 @@ function GetRect3DCorners(cf: CFrame, size: Vector3)
         corners[i] = cf * offsets[i]
     end
 
-    return corners
+    -- Project all corners
+    local projected = {}
+    for i, corner in ipairs(corners) do
+        local screenPos, onScreen = Camera:WorldToViewportPoint(corner)
+        -- if not onScreen then
+        --     -- If ANY corner is off-screen, you can choose to skip drawing
+        --     -- or clamp it. For now, we skip.
+        --     return
+        -- end
+        projected[i] = Vector2.new(screenPos.X, screenPos.Y)
+    end
+
+    return projected
+end
+
+function GetRectCorners(cf: CFrame, size: Vector3)
+    local Camera = workspace.CurrentCamera
+    local hx, hy = size.X/2, size.Y/2
+
+    local offsets = {
+        BottomLeft = Vector3.new(-hx, -hy, 0); -- bottom-left
+        BottomRight = Vector3.new( hx, -hy, 0); -- bottom-right
+        TopRight = Vector3.new( hx,  hy, 0); -- top-right
+        TopLeft = Vector3.new(-hx,  hy, 0); -- top-left
+    }
+
+    local corners = {}
+    for i, offset in pairs(offsets) do
+        corners[i] = cf * offset
+    end
+
+    -- Project all corners
+    local projected = {}
+    for i, corner in pairs(corners) do
+        local screenPos, onScreen = Camera:WorldToViewportPoint(corner)
+        -- if not onScreen then
+        --     -- If ANY corner is off-screen, you can choose to skip drawing
+        --     -- or clamp it. For now, we skip.
+        --     return
+        -- end
+        projected[i] = Vector2.new(screenPos.X, screenPos.Y)
+    end
+
+    return projected
 end
 
 function CalculateRect2D(object: BasePart|Model)
@@ -157,16 +205,14 @@ function CalculateRect2D(object: BasePart|Model)
     end
 	local Camera = workspace.CurrentCamera
 	
-	local CornerTable = {
-		TopLeft = Camera:WorldToViewportPoint(Vector3.new(CF.X - Size.X / 2, CF.Y + Size.Y / 2, CF.Z)),
-		TopRight = Camera:WorldToViewportPoint(Vector3.new(CF.X + Size.X / 2, CF.Y + Size.Y / 2, CF.Z)),
-		BottomLeft = Camera:WorldToViewportPoint(Vector3.new(CF.X - Size.X / 2, CF.Y - Size.Y / 2, CF.Z)),
-		BottomRight = Camera:WorldToViewportPoint(Vector3.new(CF.X + Size.X / 2, CF.Y - Size.Y / 2, CF.Z))
-	}
+    local CornerTable = GetRectCorners(CF, Size)
 	
 	local ViewportPoint, OnScreen = Camera:WorldToViewportPoint(CF.Position)
-	local ScreenSize = Vector2.new((CornerTable.TopLeft - CornerTable.TopRight).Magnitude, (CornerTable.TopLeft - CornerTable.BottomLeft).Magnitude)
-    local ScreenPosition = Vector2.new(ViewportPoint.X - ScreenSize.X / 2, ViewportPoint.Y - ScreenSize.Y / 2)
+
+    local Anchors = GetRect2DAnchors(CornerTable)
+	local ScreenSize = Vector2.new((Anchors.Right - Anchors.Left).Magnitude, (Anchors.Bottom - Anchors.Top).Magnitude)
+    local ScreenPosition = Anchors.Center
+
 	return {
         CF = CF;
         Size = Size;
@@ -174,6 +220,7 @@ function CalculateRect2D(object: BasePart|Model)
 		ScreenPosition = ScreenPosition;
 		ScreenSize = ScreenSize;
 		OnScreen = OnScreen;
+        ScreenPoints = CornerTable;
 	}
 end
 ESP.CalculateRect2D = CalculateRect2D
@@ -192,17 +239,15 @@ function CalculateRect3D(object: BasePart|Model)
         Size = object.Size
     end
 	local Camera = workspace.CurrentCamera
-	
-	local CornerTable = {
-		TopLeft = Camera:WorldToViewportPoint(Vector3.new(CF.X - Size.X / 2, CF.Y + Size.Y / 2, CF.Z)),
-		TopRight = Camera:WorldToViewportPoint(Vector3.new(CF.X + Size.X / 2, CF.Y + Size.Y / 2, CF.Z)),
-		BottomLeft = Camera:WorldToViewportPoint(Vector3.new(CF.X - Size.X / 2, CF.Y - Size.Y / 2, CF.Z)),
-		BottomRight = Camera:WorldToViewportPoint(Vector3.new(CF.X + Size.X / 2, CF.Y - Size.Y / 2, CF.Z))
-	}
+
+    local CornerTable = GetRectCorners(CF, Size)
 	
 	local ViewportPoint, OnScreen = Camera:WorldToViewportPoint(CF.Position)
-	local ScreenSize = Vector2.new((CornerTable.TopLeft - CornerTable.TopRight).Magnitude, (CornerTable.TopLeft - CornerTable.BottomLeft).Magnitude)
-    local ScreenPosition = Vector2.new(ViewportPoint.X - ScreenSize.X / 2, ViewportPoint.Y - ScreenSize.Y / 2)
+
+    local Anchors = GetRect2DAnchors(CornerTable)
+	local ScreenSize = Vector2.new((Anchors.Right - Anchors.Left).Magnitude, (Anchors.Bottom - Anchors.Top).Magnitude)
+    local ScreenPosition = Anchors.Center
+
 	return {
         CF = CF;
         Size = Size;
@@ -210,9 +255,27 @@ function CalculateRect3D(object: BasePart|Model)
 		ScreenPosition = ScreenPosition;
 		ScreenSize = ScreenSize;
 		OnScreen = OnScreen;
+        ScreenPoints = CornerTable;
 	}
 end
 ESP.CalculateRect3D = CalculateRect3D
+
+function CalculateBox3D(object: BasePart|Model)
+    if not object then return end
+    local rect3dCalculations = CalculateRect3D(object)
+
+    local CornerTable = GetBox3DCorners(rect3dCalculations.CF, rect3dCalculations.Size)
+    local Anchors = GetRect2DAnchors(CornerTable)
+	local ScreenSize = Vector2.new((Anchors.Right - Anchors.Left).Magnitude, (Anchors.Bottom - Anchors.Top).Magnitude)
+    local ScreenPosition = Anchors.Center
+
+    rect3dCalculations.ScreenPosition = ScreenPosition
+    rect3dCalculations.ScreenSize = ScreenSize
+    rect3dCalculations.ScreenPoints = CornerTable
+
+    return rect3dCalculations
+end
+ESP.CalculateBox3D = CalculateBox3D
 
 BOX_3D_EDGES = {
     {1,2}; {1,3}; {1,5};
@@ -251,20 +314,6 @@ function IsFaceVisible(pA, pB, pC)
     local AC = pC - pA
     local crossZ = AB.X * AC.Y - AB.Y * AC.X
     return crossZ < 0 -- negative = facing camera (Roblox screen coords are flipped)
-end
-
-function GetScreenBounds(points)
-    local minX, minY = math.huge, math.huge
-    local maxX, maxY = -math.huge, -math.huge
-
-    for _, p in ipairs(points) do
-        if p.X < minX then minX = p.X end
-        if p.Y < minY then minY = p.Y end
-        if p.X > maxX then maxX = p.X end
-        if p.Y > maxY then maxY = p.Y end
-    end
-
-    return minX, minY, maxX, maxY
 end
 
 function GetTracerAnchors(points)
@@ -309,21 +358,10 @@ function CreateDrawing(drawType, properties)
         assert(BoxCorners and type(BoxCorners) == "table", "[ERROR] drawing.data.BoxCorners must be a table!")
         assert(#BoxCorners == 8, "[ERROR] #drawing.data.BoxCorners must be equal to 8!")
         for i, v in ipairs(BoxCorners) do
-            assert(v and typeof(v) == "Vector3", "[ERROR] drawing.data.BoxCorners["..tostring(i).."] must be a Vector3!")
+            assert(v and typeof(v) == "Vector2", "[ERROR] drawing.data.BoxCorners["..tostring(i).."] must be a Vector2!")
         end
 
-        -- Project all corners
-        local projected = {}
-        for i, corner in ipairs(BoxCorners) do
-            local screenPos, onScreen = Camera:WorldToViewportPoint(corner)
-            -- if not onScreen then
-            --     -- If ANY corner is off-screen, you can choose to skip drawing
-            --     -- or clamp it. For now, we skip.
-            --     return
-            -- end
-            projected[i] = Vector2.new(screenPos.X, screenPos.Y)
-        end
-        ScreenPoints = projected
+        ScreenPoints = BoxCorners
 
         if drawing.visible then
             -- Draw visible faces
@@ -413,21 +451,10 @@ function CreateDrawing(drawType, properties)
         assert(QuadCorners and type(QuadCorners) == "table", "[ERROR] drawing.data.QuadCorners must be a table!")
         assert(#QuadCorners == 4, "[ERROR] #drawing.data.QuadCorners must be equal to 4!")
         for i, v in ipairs(QuadCorners) do
-            assert(v and typeof(v) == "Vector3", "[ERROR] drawing.data.QuadCorners["..tostring(i).."] must be a Vector3!")
+            assert(v and typeof(v) == "Vector2", "[ERROR] drawing.data.QuadCorners["..tostring(i).."] must be a Vector2!")
         end
 
-        -- Project all corners
-        local projected = {}
-        for i, corner in ipairs(QuadCorners) do
-            local screenPos, onScreen = Camera:WorldToViewportPoint(corner)
-            -- if not onScreen then
-            --     -- If ANY corner is off-screen, you can choose to skip drawing
-            --     -- or clamp it. For now, we skip.
-            --     return
-            -- end
-            projected[i] = Vector2.new(screenPos.X, screenPos.Y)
-        end
-        ScreenPoints = projected
+        ScreenPoints = QuadCorners
 
         if drawing.visible then
             -- Filled Quad
