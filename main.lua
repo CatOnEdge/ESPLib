@@ -612,40 +612,40 @@ function CreateDrawing(drawType, properties)
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
 
         if drawing.visible then
-            local text = Drawing.new("Text")
-            text.Visible = true;
-            text.Center = drawing.data.Center ~= nil and type(drawing.data.Center) == "boolean" and drawing.data.Center or true;
-            text.Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or true;
-            text.Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.Plex;
-            text.Size = drawing.data.FontSize ~= nil and type(drawing.data.FontSize) == "number" and drawing.data.FontSize > 0 and drawing.data.FontSize or 14;
-            text.ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 3;
-            text.Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-            text.Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            text.OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
-            text.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
+            local DropText = Drawing.new("Text")
+            DropText.Visible = true;
+            DropText.Center = drawing.data.Center ~= nil and type(drawing.data.Center) == "boolean" and drawing.data.Center or true;
+            DropText.Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or true;
+            DropText.Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.Plex;
+            DropText.Size = drawing.data.FontSize ~= nil and type(drawing.data.FontSize) == "number" and drawing.data.FontSize > 0 and drawing.data.FontSize or 14;
+            DropText.ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 3;
+            DropText.Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+            DropText.Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+            DropText.OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
+            DropText.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
             print("CHECK 1")
-            print("text.Text", text.Text)
-            print("text.Font", text.Font)
-            print("text.TextBounds", text.TextBounds)
-            print("text.Position", text.Position)
-            print("text.Size", text.Size)
+            print("DropText.Text", DropText.Text)
+            print("DropText.Font", DropText.Font)
+            print("DropText.TextBounds", DropText.TextBounds)
+            print("DropText.Position", DropText.Position)
+            print("DropText.Size", DropText.Size)
             print("CHECK 2")
-            print("text.Visible", text.Visible)
-            print("text.Center", text.Center)
-            print("text.Outline", text.Outline)
-            print("text.OutlineColor", text.OutlineColor)
-            print("text.Transparency", text.Transparency)
-            print("text.ZIndex", text.ZIndex)
-            print("text.Color", text.Color)
+            print("DropText.Visible", DropText.Visible)
+            print("DropText.Center", DropText.Center)
+            print("DropText.Outline", DropText.Outline)
+            print("DropText.OutlineColor", DropText.OutlineColor)
+            print("DropText.Transparency", DropText.Transparency)
+            print("DropText.ZIndex", DropText.ZIndex)
+            print("DropText.Color", DropText.Color)
             print("CHECK 3")
 
-            text.Position = Pos;
+            DropText.Position = Pos;
 
             ScreenPoints = {
-                Pos + Vector2.new(-text.TextBounds.X/2, -text.TextBounds.X/2);
-                Pos + Vector2.new(-text.TextBounds.X/2, text.TextBounds.X/2);
-                Pos + Vector2.new(text.TextBounds.X/2, text.TextBounds.X/2);
-                Pos + Vector2.new(text.TextBounds.X/2, -text.TextBounds.X/2);
+                Pos + Vector2.new(-DropText.TextBounds.X/2, -DropText.TextBounds.X/2);
+                Pos + Vector2.new(-DropText.TextBounds.X/2, DropText.TextBounds.X/2);
+                Pos + Vector2.new(DropText.TextBounds.X/2, DropText.TextBounds.X/2);
+                Pos + Vector2.new(DropText.TextBounds.X/2, -DropText.TextBounds.X/2);
             }
         end
     end
@@ -749,7 +749,7 @@ end
 
 -- Clear all drawings
 function ESP:clear()
-    -- cleardrawcache()
+    cleardrawcache()
 end
 
 -- Render all visible drawings (calls user-defined render functions)
