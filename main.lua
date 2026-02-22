@@ -319,19 +319,6 @@ function IsFaceVisible(pA, pB, pC)
     return crossZ < 0 -- negative = facing camera (Roblox screen coords are flipped)
 end
 
-function GetTracerAnchors(points)
-    local minX, minY, maxX, maxY = GetScreenBounds(points)
-
-    local centerX = (minX + maxX) * 0.5
-    local centerY = (minY + maxY) * 0.5
-
-    return {
-        Top = Vector2.new(centerX, minY),
-        Center = Vector2.new(centerX, centerY),
-        Bottom = Vector2.new(centerX, maxY),
-    }
-end
-
 -- Drawing object constructor
 function CreateDrawing(drawType, properties)
     properties = properties or {}
@@ -644,8 +631,10 @@ function CreateDrawing(drawType, properties)
         }
     end
 
+    drawing.ScreenPoints = ScreenPoints
+    drawing.Anchors = drawing.data.Anchors or GetRect2DAnchors(ScreenPoints)
+
     if drawing.tracer ~= nil and type(drawing.tracer) == "table" then
-        local TracerAnchors = GetTracerAnchors(ScreenPoints)
         local origin = drawing.tracer.origin ~= nil and type(drawing.tracer.origin) == "string" and drawing.tracer.origin or TRACER_ORIGINS.MOUSE;
         local target = drawing.tracer.target ~= nil and type(drawing.tracer.target) == "string" and drawing.tracer.target or TRACER_TARGETS.CENTER;
         local color = drawing.tracer.color ~= nil and typeof(drawing.tracer.color) == "Color3" and drawing.tracer.color or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
@@ -668,11 +657,11 @@ function CreateDrawing(drawType, properties)
         end
 
         if target == TRACER_TARGETS.CENTER then
-            targetPos = TracerAnchors.Center
+            targetPos = drawing.Anchors.Center
         elseif target == TRACER_TARGETS.BOTTOM then
-            targetPos = TracerAnchors.Bottom
+            targetPos = drawing.Anchors.Bottom
         elseif target == TRACER_TARGETS.TOP then
-            targetPos = TracerAnchors.Top
+            targetPos = drawing.Anchors.Top
         end
 
         local tracer = AddDrawing("Line", {
@@ -687,8 +676,6 @@ function CreateDrawing(drawType, properties)
             Thickness = drawing.data.Thickness or 1;
         })
     end
-    
-    drawing.ScreenPoints = ScreenPoints
 
     return drawing
 end
