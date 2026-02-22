@@ -234,8 +234,6 @@ function CreateDrawing(drawType, properties)
     local drawing = {
         type = drawType;
         color = properties.color or Color3.new(1,1,1);
-        category = properties.category or "default";
-        visible = properties.visible ~= false;
         tracer = properties.tracer or nil;
         data = properties.data or {};
     }
@@ -249,7 +247,6 @@ function CreateDrawing(drawType, properties)
         }
     end
 
-    if not drawing.visible then return drawing end
     local Camera = workspace.CurrentCamera
 
     local ScreenPoints = {}
