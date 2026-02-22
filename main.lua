@@ -95,7 +95,7 @@ function GetScreenBounds(points)
     local minX, minY = math.huge, math.huge
     local maxX, maxY = -math.huge, -math.huge
 
-    for _, p in ipairs(points) do
+    for _, p in pairs(points) do
         if p.X < minX then minX = p.X end
         if p.Y < minY then minY = p.Y end
         if p.X > maxX then maxX = p.X end
@@ -221,6 +221,7 @@ function CalculateRect2D(object: BasePart|Model)
 		ScreenSize = ScreenSize;
 		OnScreen = OnScreen;
         ScreenPoints = CornerTable;
+        Anchors = Anchors;
 	}
 end
 ESP.CalculateRect2D = CalculateRect2D
@@ -256,6 +257,7 @@ function CalculateRect3D(object: BasePart|Model)
 		ScreenSize = ScreenSize;
 		OnScreen = OnScreen;
         ScreenPoints = CornerTable;
+        Anchors = Anchors;
 	}
 end
 ESP.CalculateRect3D = CalculateRect3D
@@ -272,6 +274,7 @@ function CalculateBox3D(object: BasePart|Model)
     rect3dCalculations.ScreenPosition = ScreenPosition
     rect3dCalculations.ScreenSize = ScreenSize
     rect3dCalculations.ScreenPoints = CornerTable
+    rect3dCalculations.Anchors = Anchors
 
     return rect3dCalculations
 end
@@ -354,7 +357,7 @@ function CreateDrawing(drawType, properties)
 
     local ScreenPoints = {}
     if drawing.type == DRAW_TYPES.BOX_3D then
-        local BoxCorners = drawing.data.BoxCorners
+        local BoxCorners = drawing.data.ScreenPoints
         assert(BoxCorners and type(BoxCorners) == "table", "[ERROR] drawing.data.BoxCorners must be a table!")
         assert(#BoxCorners == 8, "[ERROR] #drawing.data.BoxCorners must be equal to 8!")
         for i, v in ipairs(BoxCorners) do
@@ -366,10 +369,10 @@ function CreateDrawing(drawType, properties)
         if drawing.visible then
             -- Draw visible faces
             for _, face in ipairs(BOX_3D_FACES) do
-                local A = projected[face[1]]
-                local B = projected[face[2]]
-                local C = projected[face[3]]
-                local D = projected[face[4]]
+                local A = ScreenPoints[face[1]]
+                local B = ScreenPoints[face[2]]
+                local C = ScreenPoints[face[3]]
+                local D = ScreenPoints[face[4]]
                 -- Cull backfaces
                 if IsFaceVisible(A, B, C) then
                     local QuadCorners = {A, B, C, D}
@@ -407,9 +410,16 @@ function CreateDrawing(drawType, properties)
             end
         end
     elseif drawing.type == DRAW_TYPES.RECT_2D then
-        local Pos, Size = drawing.data.Pos, drawing.data.Size
+        local Pos, Size, RectCorners = drawing.data.Pos, drawing.data.Size, drawing.data.ScreenPoints
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
         assert(Size and typeof(Size) == "Vector2", "[ERROR] drawing.data.Size must be a Vector2!")
+        assert(RectCorners and type(RectCorners) == "table", "[ERROR] drawing.data.RectCorners must be a table!")
+        assert(#RectCorners == 4, "[ERROR] #drawing.data.RectCorners must be equal to 4!")
+        for i, v in ipairs(RectCorners) do
+            assert(v and typeof(v) == "Vector2", "[ERROR] drawing.data.RectCorners["..tostring(i).."] must be a Vector2!")
+        end
+
+        ScreenPoints = RectCorners
 
         if drawing.visible then
             -- Filled Square
@@ -439,15 +449,8 @@ function CreateDrawing(drawType, properties)
                 Filled = false;
             })
         end
-
-        ScreenPoints = {
-            Pos + Vector2.new(-Size.X/2, -Size.X/2);
-            Pos + Vector2.new(-Size.X/2, Size.X/2);
-            Pos + Vector2.new(Size.X/2, Size.X/2);
-            Pos + Vector2.new(Size.X/2, -Size.X/2);
-        }
     elseif drawing.type == DRAW_TYPES.RECT_3D then
-        local QuadCorners = drawing.data.QuadCorners
+        local QuadCorners = drawing.data.ScreenPoints
         assert(QuadCorners and type(QuadCorners) == "table", "[ERROR] drawing.data.QuadCorners must be a table!")
         assert(#QuadCorners == 4, "[ERROR] #drawing.data.QuadCorners must be equal to 4!")
         for i, v in ipairs(QuadCorners) do
@@ -465,10 +468,10 @@ function CreateDrawing(drawType, properties)
                 Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
                 Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Quad
-                PointA = ScreenPoints[1];
-                PointB = ScreenPoints[2];
-                PointC = ScreenPoints[3];
-                PointD = ScreenPoints[4];
+                PointA = ScreenPoints.TopLeft;
+                PointB = ScreenPoints.TopRight;
+                PointC = ScreenPoints.BottomRight;
+                PointD = ScreenPoints.BottomLeft;
                 Thickness = 1;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
             })
@@ -480,10 +483,10 @@ function CreateDrawing(drawType, properties)
                 Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Quad
-                PointA = ScreenPoints[1];
-                PointB = ScreenPoints[2];
-                PointC = ScreenPoints[3];
-                PointD = ScreenPoints[4];
+                PointA = ScreenPoints.TopLeft;
+                PointB = ScreenPoints.TopRight;
+                PointC = ScreenPoints.BottomRight;
+                PointD = ScreenPoints.BottomLeft;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
                 Filled = false;
             })
