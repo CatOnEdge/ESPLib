@@ -629,7 +629,7 @@ function CreateDrawing(drawType, properties)
             print("text.Text", text.Text)
             text.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
             print("text.Font", text.Font)
-            text.Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.UI;
+            -- text.Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.UI;
 
             print("text.Text", text.Text)
             print("text.TextBounds", text.TextBounds)
