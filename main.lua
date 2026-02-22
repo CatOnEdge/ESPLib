@@ -626,14 +626,19 @@ function CreateDrawing(drawType, properties)
                 OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             })
 
-            print("text.Text", text.Text)
             text.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
-            print("text.Font", text.Font)
-            -- text.Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.UI;
-
             print("text.Text", text.Text)
+            print("text.Font", text.Font)
             print("text.TextBounds", text.TextBounds)
             print("text.Position", text.Position)
+            print("text.Size", text.Size)
+            print("text.Visible", text.Visible)
+            print("text.Center", text.Center)
+            print("text.Outline", text.Outline)
+            print("text.OutlineColor", text.OutlineColor)
+            print("text.Transparency", text.Transparency)
+            print("text.ZIndex", text.ZIndex)
+            print("text.Color", text.Color)
 
             ScreenPoints = {
                 Pos + Vector2.new(-text.TextBounds.X/2, -text.TextBounds.X/2);
