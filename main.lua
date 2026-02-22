@@ -319,6 +319,14 @@ function IsFaceVisible(pA, pB, pC)
     return crossZ < 0 -- negative = facing camera (Roblox screen coords are flipped)
 end
 
+function CountList(list)
+    local count = 0
+    for _, _ in pairs(list) do
+        count += 1
+    end
+    return count
+end
+
 -- Drawing object constructor
 function CreateDrawing(drawType, properties)
     properties = properties or {}
@@ -345,10 +353,10 @@ function CreateDrawing(drawType, properties)
     local ScreenPoints = {}
     if drawing.type == DRAW_TYPES.BOX_3D then
         local BoxCorners = drawing.data.ScreenPoints
-        assert(BoxCorners and type(BoxCorners) == "table", "[ERROR] drawing.data.BoxCorners must be a table!")
-        assert(#BoxCorners == 8, "[ERROR] #drawing.data.BoxCorners must be equal to 8!")
-        for i, v in ipairs(BoxCorners) do
-            assert(v and typeof(v) == "Vector2", "[ERROR] drawing.data.BoxCorners["..tostring(i).."] must be a Vector2!")
+        assert(BoxCorners and type(BoxCorners) == "table", "[ERROR] BoxCorners must be a table!")
+        assert(CountList(BoxCorners) == 8, "[ERROR] BoxCorners must have 8 corners!")
+        for i, v in pairs(BoxCorners) do
+            assert(v and typeof(v) == "Vector2", "[ERROR] BoxCorners["..tostring(i).."] must be a Vector2!")
         end
 
         ScreenPoints = BoxCorners
@@ -400,10 +408,10 @@ function CreateDrawing(drawType, properties)
         local Pos, Size, RectCorners = drawing.data.Pos, drawing.data.Size, drawing.data.ScreenPoints
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
         assert(Size and typeof(Size) == "Vector2", "[ERROR] drawing.data.Size must be a Vector2!")
-        assert(RectCorners and type(RectCorners) == "table", "[ERROR] drawing.data.RectCorners must be a table!")
-        assert(#RectCorners == 4, "[ERROR] #drawing.data.RectCorners must be equal to 4!")
-        for i, v in ipairs(RectCorners) do
-            assert(v and typeof(v) == "Vector2", "[ERROR] drawing.data.RectCorners["..tostring(i).."] must be a Vector2!")
+        assert(RectCorners and type(RectCorners) == "table", "[ERROR] RectCorners must be a table!")
+        assert(CountList(RectCorners) == 4, "[ERROR] RectCorners must have 4 corners!")
+        for i, v in pairs(RectCorners) do
+            assert(v and typeof(v) == "Vector2", "[ERROR] RectCorners["..tostring(i).."] must be a Vector2!")
         end
 
         ScreenPoints = RectCorners
@@ -438,10 +446,10 @@ function CreateDrawing(drawType, properties)
         end
     elseif drawing.type == DRAW_TYPES.RECT_3D then
         local QuadCorners = drawing.data.ScreenPoints
-        assert(QuadCorners and type(QuadCorners) == "table", "[ERROR] drawing.data.QuadCorners must be a table!")
-        assert(#QuadCorners == 4, "[ERROR] #drawing.data.QuadCorners must be equal to 4!")
-        for i, v in ipairs(QuadCorners) do
-            assert(v and typeof(v) == "Vector2", "[ERROR] drawing.data.QuadCorners["..tostring(i).."] must be a Vector2!")
+        assert(QuadCorners and type(QuadCorners) == "table", "[ERROR] QuadCorners must be a table!")
+        assert(CountList(QuadCorners) == 4, "[ERROR] QuadCorners must be have to 4 corners!")
+        for i, v in pairs(QuadCorners) do
+            assert(v and typeof(v) == "Vector2", "[ERROR] QuadCorners["..tostring(i).."] must be a Vector2!")
         end
 
         ScreenPoints = QuadCorners
