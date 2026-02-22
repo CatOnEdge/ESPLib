@@ -9,6 +9,7 @@
 
 local genv = getgenv()
 
+local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
@@ -166,6 +167,33 @@ function IsFaceVisible(pA, pB, pC)
     return crossZ < 0 -- negative = facing camera (Roblox screen coords are flipped)
 end
 
+function GetScreenBounds(points)
+    local minX, minY = math.huge, math.huge
+    local maxX, maxY = -math.huge, -math.huge
+
+    for _, p in ipairs(points) do
+        if p.X < minX then minX = p.X end
+        if p.Y < minY then minY = p.Y end
+        if p.X > maxX then maxX = p.X end
+        if p.Y > maxY then maxY = p.Y end
+    end
+
+    return minX, minY, maxX, maxY
+end
+
+function GetTracerAnchors(points)
+    local minX, minY, maxX, maxY = GetScreenBounds(points)
+
+    local centerX = (minX + maxX) * 0.5
+    local centerY = (minY + maxY) * 0.5
+
+    return {
+        Top = Vector2.new(centerX, minY),
+        Center = Vector2.new(centerX, centerY),
+        Bottom = Vector2.new(centerX, maxY),
+    }
+end
+
 -- Drawing object constructor
 function CreateDrawing(drawType, properties)
     properties = properties or {}
@@ -297,6 +325,7 @@ function ESP:renderDrawing(drawing)
     if not drawing.visible then return end
     local Camera = workspace.CurrentCamera
 
+    local ScreenPoints = {}
     if drawing.type == DRAW_TYPES.BOX_3D then
         local Pos1, Pos2 = drawing.data.Pos1, drawing.data.Pos2
         assert(Pos1 and typeof(Pos1) == "Vector3", "[ERROR] drawing.data.Pos1 must be a Vector3!")
@@ -313,6 +342,7 @@ function ESP:renderDrawing(drawing)
             -- end
             projected[i] = Vector2.new(screenPos.X, screenPos.Y)
         end
+        ScreenPoints = projected
         -- Draw visible faces
         for _, face in ipairs(BOX_3D_FACES) do
             local A = projected[face[1]]
@@ -384,6 +414,12 @@ function ESP:renderDrawing(drawing)
             Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
             Filled = false;
         })
+        ScreenPoints = {
+            Pos + Vector2.new(-Size.X/2, -Size.X/2);
+            Pos + Vector2.new(-Size.X/2, Size.X/2);
+            Pos + Vector2.new(Size.X/2, Size.X/2);
+            Pos + Vector2.new(Size.X/2, -Size.X/2);
+        }
     elseif drawing.type == DRAW_TYPES.RECT_3D then
         local QuadCorners = drawing.data.QuadCorners
         assert(QuadCorners and type(QuadCorners) == "table", "[ERROR] drawing.data.QuadCorners must be a table!")
@@ -421,9 +457,11 @@ function ESP:renderDrawing(drawing)
             Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
             Filled = false;
         })
+        ScreenPoints = QuadCorners
     elseif drawing.type == DRAW_TYPES.CIRCLE_2D then
         local Pos = drawing.data.CenterPos
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.CenterPos must be a Vector2!")
+        local Radius = drawing.data.Radius ~= nil and type(drawing.data.Radius) == "number" and drawing.data.Radius> 0 and drawing.data.Radius or 16;
         -- Filled Circle
         local Main = AddDrawing("Circle", {
             --BaseDrawingObject
@@ -433,7 +471,7 @@ function ESP:renderDrawing(drawing)
             Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
             --Circle
             NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
-            Radius = drawing.data.Radius ~= nil and type(drawing.data.Radius) == "number" and drawing.data.Radius> 0 and drawing.data.Radius or 16;
+            Radius = Radius;
             Position = Pos;
             Thickness = 1;
             Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
@@ -447,11 +485,16 @@ function ESP:renderDrawing(drawing)
             Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
             --Circle
             NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
-            Radius = drawing.data.Radius ~= nil and type(drawing.data.Radius) == "number" and drawing.data.Radius> 0 and drawing.data.Radius or 16;
+            Radius = Radius;
             Position = Pos;
             Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
             Filled = false
         })
+        ScreenPoints = {
+            Pos;
+            Pos + Vector2.yAxis * Radius;
+            Pos - Vector2.yAxis * Radius;
+        }
     elseif drawing.type == DRAW_TYPES.CIRCLE_3D then
         local steps = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16
         local radius = drawing.data.Radius ~= nil and type(drawing.data.Radius) == "number" and drawing.data.Radius> 0 and drawing.data.Radius or 16
@@ -471,6 +514,7 @@ function ESP:renderDrawing(drawing)
 
             -- Project to screen
             local screen1 = Camera:WorldToViewportPoint(p1_world)
+            table.insert(ScreenPoints, Vector2.new(screen1.X, screen1.Y))
             local screen2 = Camera:WorldToViewportPoint(p2_world)
 
             if screen1 and screen2 then
@@ -502,6 +546,7 @@ function ESP:renderDrawing(drawing)
             To = Pos2;
             Thickness = drawing.data.Thickness or 1;
         })
+        ScreenPoints = {Pos1, Pos2}
     elseif drawing.type == DRAW_TYPES.LINE_3D then
         local Pos1, Pos2 = drawing.data.Pos1, drawing.data.Pos2
         assert(Pos1 and typeof(Pos1) == "Vector3", "[ERROR] drawing.data.Pos1 must be a Vector3!")
@@ -522,6 +567,7 @@ function ESP:renderDrawing(drawing)
             To = screen2;
             Thickness = drawing.data.Thickness or 1;
         })
+        ScreenPoints = {screen1, screen2}
     elseif drawing.type == DRAW_TYPES.TEXT then
         local Pos, TextBounds = drawing.data.Pos, drawing.data.TextBounds
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
@@ -542,6 +588,59 @@ function ESP:renderDrawing(drawing)
             Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or false;
             OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new(0,0,0);
         })
+        ScreenPoints = {
+            Pos + Vector2.new(-TextBounds.X/2, -TextBounds.X/2);
+            Pos + Vector2.new(-TextBounds.X/2, TextBounds.X/2);
+            Pos + Vector2.new(TextBounds.X/2, TextBounds.X/2);
+            Pos + Vector2.new(TextBounds.X/2, -TextBounds.X/2);
+        }
+    end
+
+    if drawing.tracer ~= nil and type(drawing.tracer) == "table" then
+        local enabled = drawing.tracer.enabled ~= nil and type(drawing.tracer.enabled) == "boolean" and drawing.tracer.enabled or false;
+        if enabled then
+            local TracerAnchors = GetTracerAnchors(ScreenPoints)
+            local origin = drawing.tracer.origin ~= nil and type(drawing.tracer.origin) == "string" and drawing.tracer.origin or TRACER_ORIGINS.MOUSE;
+            local target = drawing.tracer.target ~= nil and type(drawing.tracer.target) == "string" and drawing.tracer.target or TRACER_TARGETS.CENTER;
+            local color = drawing.tracer.color ~= nil and typeof(drawing.tracer.color) == "Color3" and drawing.tracer.color or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+
+            local originPos: Vector2
+            local targetPos: Vector2
+
+            if origin == TRACER_ORIGINS.MOUSE then
+                originPos = UserInputService:GetMouseLocation()
+            else
+                local ViewportSize = Camera.ViewportSize
+                local Center = Vector2.new(ViewportSize.X/2, ViewportSize.Y/2)
+                if origin == TRACER_ORIGINS.CENTER then
+                    originPos = Center
+                elseif origin == TRACER_ORIGINS.BOTTOM then
+                    originPos = Center + Vector2.yAxis * ViewportSize.Y * 0.8;
+                elseif origin == TRACER_ORIGINS.TOP then
+                    originPos = Center - Vector2.yAxis * ViewportSize.Y * 0.8;
+                end
+            end
+
+            if target == TRACER_TARGETS.CENTER then
+                targetPos = TracerAnchors.Center
+            elseif target == TRACER_TARGETS.BOTTOM then
+                targetPos = TracerAnchors.Bottom
+            elseif target == TRACER_TARGETS.TOP then
+                targetPos = TracerAnchors.Top
+            end
+
+            local tracer = AddDrawing("Line", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Color = color;
+                --Line
+                From = originPos;
+                To = targetPos;
+                Thickness = drawing.data.Thickness or 1;
+            })
+        end
     end
 end
 
