@@ -91,18 +91,27 @@ function RoundUp(n: number): number
 end
 ESP.RoundUp = RoundUp
 
-function GetBox3DCorners(p1: Vector3, p2: Vector3)
-    return {
-        Vector3.new(p1.X, p1.Y, p1.Z);
-        Vector3.new(p1.X, p1.Y, p2.Z);
-        Vector3.new(p1.X, p2.Y, p1.Z);
-        Vector3.new(p1.X, p2.Y, p2.Z);
+function GetBox3DCorners(cf: CFrame, size: Vector3)
+    local hx, hy, hz = size.X/2, size.Y/2, size.Z/2
 
-        Vector3.new(p2.X, p1.Y, p1.Z);
-        Vector3.new(p2.X, p1.Y, p2.Z);
-        Vector3.new(p2.X, p2.Y, p1.Z);
-        Vector3.new(p2.X, p2.Y, p2.Z);
+    local offsets = {
+        Vector3.new(-hx, -hy, -hz),
+        Vector3.new(-hx, -hy,  hz),
+        Vector3.new(-hx,  hy, -hz),
+        Vector3.new(-hx,  hy,  hz),
+
+        Vector3.new( hx, -hy, -hz),
+        Vector3.new( hx, -hy,  hz),
+        Vector3.new( hx,  hy, -hz),
+        Vector3.new( hx,  hy,  hz),
     }
+
+    local corners = {}
+    for i = 1, 8 do
+        corners[i] = cf * offsets[i]
+    end
+
+    return corners
 end
 
 function GetRect2DCorners(p1: Vector2, p2: Vector2)
@@ -146,20 +155,41 @@ function CalculateRect2D(object: BasePart|Model)
 end
 ESP.CalculateRect2D = CalculateRect2D
 
-function CalculateBox3D(object: BasePart|Model)
+function CalculateQuad2D(object: BasePart|Model)
     if not object then return end
-    local rect2DCalculations = CalculateRect2D(object)
-    local CF = rect2DCalculations.CF
-    local Size = rect2DCalculations.Size
-
-    local Pos1 = CF * CFrame.new(-Size.X/2, -Size.Y/2, -Size.Z/2)
-    local Pos2 = CF * CFrame.new(Size.X/2, Size.Y/2, Size.Z/2)
-
-    rect2DCalculations.Pos1 = Pos1
-    rect2DCalculations.Pos2 = Pos2
-    return rect2DCalculations
+    local CF, Size
+    if object:IsA("Model") then
+        CF = object.PrimaryPart and object.PrimaryPart.CFrame or object:GetPivot() or nil
+        Size = object:GetExtentsSize()
+        if not CF then
+            CF, Size = object:GetBoundingBox()
+        end
+    elseif object:IsA("BasePart") then
+        CF = object.CFrame
+        Size = object.Size
+    end
+	local Camera = workspace.CurrentCamera
+	
+	local CornerTable = {
+		TopLeft = Camera:WorldToViewportPoint(Vector3.new(CF.X - Size.X / 2, CF.Y + Size.Y / 2, CF.Z)),
+		TopRight = Camera:WorldToViewportPoint(Vector3.new(CF.X + Size.X / 2, CF.Y + Size.Y / 2, CF.Z)),
+		BottomLeft = Camera:WorldToViewportPoint(Vector3.new(CF.X - Size.X / 2, CF.Y - Size.Y / 2, CF.Z)),
+		BottomRight = Camera:WorldToViewportPoint(Vector3.new(CF.X + Size.X / 2, CF.Y - Size.Y / 2, CF.Z))
+	}
+	
+	local ViewportPoint, OnScreen = Camera:WorldToViewportPoint(CF.Position)
+	local ScreenSize = Vector2.new((CornerTable.TopLeft - CornerTable.TopRight).Magnitude, (CornerTable.TopLeft - CornerTable.BottomLeft).Magnitude)
+    local ScreenPosition = Vector2.new(ViewportPoint.X - ScreenSize.X / 2, ViewportPoint.Y - ScreenSize.Y / 2)
+	return {
+        CF = CF;
+        Size = Size;
+        ViewportPoint = ViewportPoint;
+		ScreenPosition = ScreenPosition;
+		ScreenSize = ScreenSize;
+		OnScreen = OnScreen;
+	}
 end
-ESP.CalculateBox3D = CalculateBox3D
+ESP.CalculateQuad2D = CalculateQuad2D
 
 BOX_3D_EDGES = {
     {1,2}; {1,3}; {1,5};
