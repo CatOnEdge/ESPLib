@@ -316,7 +316,7 @@ function IsFaceVisible(pA, pB, pC)
     local AB = pB - pA
     local AC = pC - pA
     local crossZ = AB.X * AC.Y - AB.Y * AC.X
-    return crossZ < 0 -- negative = facing camera (Roblox screen coords are flipped)
+    return crossZ > 0 -- positive = facing camera (completely based on winding order)
 end
 
 function CountList(list)
