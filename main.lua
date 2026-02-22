@@ -611,11 +611,7 @@ function CreateDrawing(drawType, properties)
         local Pos = drawing.data.Pos
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
 
-        print("drawing TEXT")
-
         if drawing.visible then
-            print("is visible")
-
             local text = AddDrawing("Text", {
                 --BaseDrawingObject
                 Visible = true;
@@ -631,7 +627,6 @@ function CreateDrawing(drawType, properties)
                 Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or true;
                 OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             })
-            print("text.Text", text.Text)
 
              ScreenPoints = {
                 Pos + Vector2.new(-text.TextBounds.X/2, -text.TextBounds.X/2);
