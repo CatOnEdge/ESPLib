@@ -406,9 +406,7 @@ function CreateDrawing(drawType, properties)
             end
         end
     elseif drawing.type == DRAW_TYPES.RECT_2D then
-        local Pos, Size, RectCorners = drawing.data.Pos, drawing.data.Size, drawing.data.ScreenPoints
-        assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
-        assert(Size and typeof(Size) == "Vector2", "[ERROR] drawing.data.Size must be a Vector2!")
+        local RectCorners = drawing.data.ScreenPoints
         assert(RectCorners and type(RectCorners) == "table", "[ERROR] RectCorners must be a table!")
         assert(CountList(RectCorners) == 4, "[ERROR] RectCorners must have 4 corners!")
         for i, v in pairs(RectCorners) do
