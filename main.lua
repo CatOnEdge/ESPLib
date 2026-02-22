@@ -243,7 +243,6 @@ function CreateDrawing(drawType, properties)
     -- Tracer configuration
     if properties.tracer then
         drawing.tracer = {
-            enabled = true;
             origin = properties.tracer.origin or TRACER_ORIGINS.MOUSE;
             target = properties.tracer.target or TRACER_TARGETS.CENTER;
             color = properties.tracer.color or drawing.color;
@@ -525,50 +524,47 @@ function CreateDrawing(drawType, properties)
     end
 
     if drawing.tracer ~= nil and type(drawing.tracer) == "table" then
-        local enabled = drawing.tracer.enabled ~= nil and type(drawing.tracer.enabled) == "boolean" and drawing.tracer.enabled or false;
-        if enabled then
-            local TracerAnchors = GetTracerAnchors(ScreenPoints)
-            local origin = drawing.tracer.origin ~= nil and type(drawing.tracer.origin) == "string" and drawing.tracer.origin or TRACER_ORIGINS.MOUSE;
-            local target = drawing.tracer.target ~= nil and type(drawing.tracer.target) == "string" and drawing.tracer.target or TRACER_TARGETS.CENTER;
-            local color = drawing.tracer.color ~= nil and typeof(drawing.tracer.color) == "Color3" and drawing.tracer.color or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+        local TracerAnchors = GetTracerAnchors(ScreenPoints)
+        local origin = drawing.tracer.origin ~= nil and type(drawing.tracer.origin) == "string" and drawing.tracer.origin or TRACER_ORIGINS.MOUSE;
+        local target = drawing.tracer.target ~= nil and type(drawing.tracer.target) == "string" and drawing.tracer.target or TRACER_TARGETS.CENTER;
+        local color = drawing.tracer.color ~= nil and typeof(drawing.tracer.color) == "Color3" and drawing.tracer.color or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
 
-            local originPos: Vector2
-            local targetPos: Vector2
+        local originPos: Vector2
+        local targetPos: Vector2
 
-            if origin == TRACER_ORIGINS.MOUSE then
-                originPos = UserInputService:GetMouseLocation()
-            else
-                local ViewportSize = Camera.ViewportSize
-                local Center = Vector2.new(ViewportSize.X/2, ViewportSize.Y/2)
-                if origin == TRACER_ORIGINS.CENTER then
-                    originPos = Center
-                elseif origin == TRACER_ORIGINS.BOTTOM then
-                    originPos = Center + Vector2.yAxis * ViewportSize.Y * 0.8;
-                elseif origin == TRACER_ORIGINS.TOP then
-                    originPos = Center - Vector2.yAxis * ViewportSize.Y * 0.8;
-                end
+        if origin == TRACER_ORIGINS.MOUSE then
+            originPos = UserInputService:GetMouseLocation()
+        else
+            local ViewportSize = Camera.ViewportSize
+            local Center = Vector2.new(ViewportSize.X/2, ViewportSize.Y/2)
+            if origin == TRACER_ORIGINS.CENTER then
+                originPos = Center
+            elseif origin == TRACER_ORIGINS.BOTTOM then
+                originPos = Center + Vector2.yAxis * ViewportSize.Y * 0.8;
+            elseif origin == TRACER_ORIGINS.TOP then
+                originPos = Center - Vector2.yAxis * ViewportSize.Y * 0.8;
             end
-
-            if target == TRACER_TARGETS.CENTER then
-                targetPos = TracerAnchors.Center
-            elseif target == TRACER_TARGETS.BOTTOM then
-                targetPos = TracerAnchors.Bottom
-            elseif target == TRACER_TARGETS.TOP then
-                targetPos = TracerAnchors.Top
-            end
-
-            local tracer = AddDrawing("Line", {
-                --BaseDrawingObject
-                Visible = true;
-                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
-                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-                Color = color;
-                --Line
-                From = originPos;
-                To = targetPos;
-                Thickness = drawing.data.Thickness or 1;
-            })
         end
+
+        if target == TRACER_TARGETS.CENTER then
+            targetPos = TracerAnchors.Center
+        elseif target == TRACER_TARGETS.BOTTOM then
+            targetPos = TracerAnchors.Bottom
+        elseif target == TRACER_TARGETS.TOP then
+            targetPos = TracerAnchors.Top
+        end
+
+        local tracer = AddDrawing("Line", {
+            --BaseDrawingObject
+            Visible = true;
+            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
+            Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+            Color = color;
+            --Line
+            From = originPos;
+            To = targetPos;
+            Thickness = drawing.data.Thickness or 1;
+        })
     end
     
     drawing.ScreenPoints = ScreenPoints
