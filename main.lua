@@ -621,7 +621,7 @@ function CreateDrawing(drawType, properties)
                 --Text
                 Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
                 Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.UI;
-                Size = drawing.data.FontSize ~= nil and type(drawing.data.FontSize) == "number" and drawing.data.FontSize > 0 and drawing.data.FontSize or 12;
+                Size = drawing.data.FontSize ~= nil and type(drawing.data.FontSize) == "number" and drawing.data.FontSize > 0 and drawing.data.FontSize or 18;
                 Position = Pos;
                 Center = drawing.data.Center ~= nil and type(drawing.data.Center) == "boolean" and drawing.data.Center or true;
                 Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or false;
