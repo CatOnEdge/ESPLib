@@ -628,7 +628,8 @@ function CreateDrawing(drawType, properties)
                 OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             })
 
-            print("text made")
+            print(text)
+            print(repr(text), reprSettings)
 
             ScreenPoints = {
                 Pos + Vector2.new(-text.TextBounds.X/2, -text.TextBounds.X/2);
@@ -636,9 +637,7 @@ function CreateDrawing(drawType, properties)
                 Pos + Vector2.new(text.TextBounds.X/2, text.TextBounds.X/2);
                 Pos + Vector2.new(text.TextBounds.X/2, -text.TextBounds.X/2);
             }
-            print("screen points made")
         end
-        print("text done")
     end
 
     if ScreenPoints then
