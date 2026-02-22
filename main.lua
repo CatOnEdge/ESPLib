@@ -625,7 +625,7 @@ function CreateDrawing(drawType, properties)
                 Position = Pos;
                 Center = drawing.data.Center ~= nil and type(drawing.data.Center) == "boolean" and drawing.data.Center or true;
                 Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or false;
-                OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new(0,0,0);
+                OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             })
 
              ScreenPoints = {
