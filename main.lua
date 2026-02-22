@@ -19,8 +19,6 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 ESP = {}
-ESP.drawings = {} --the actual drawing instances
-ESP.categories = {} --all possible categories and their drawings underneath them
 
 -- Drawing types
 DRAW_TYPES = {
@@ -251,103 +249,8 @@ function CreateDrawing(drawType, properties)
             color = properties.tracer.color or drawing.color;
         }
     end
-    
-    return drawing
-end
 
--- Add drawing to library
-function ESP:addDrawing(drawType, properties)
-    local drawing = CreateDrawing(drawType, properties)
-    table.insert(self.drawings, drawing)
-    
-    if drawing.category then
-        if not self.categories[drawing.category] then
-            self.categories[drawing.category] = {}
-        end
-        table.insert(self.categories[drawing.category], drawing)
-    end
-    
-    return drawing
-end
-
--- Create 3D box
-function ESP:createBox3D(properties)
-    return self:addDrawing(DRAW_TYPES.BOX_3D, properties)
-end
-
--- Create 2D rectangle
-function ESP:createRect2D(properties)
-    return self:addDrawing(DRAW_TYPES.RECT_2D, properties)
-end
-
--- Create 3D rectangle
-function ESP:createRect3D(properties)
-    return self:addDrawing(DRAW_TYPES.RECT_3D, properties)
-end
-
--- Create 2D circle
-function ESP:createCircle2D(properties)
-    return self:addDrawing(DRAW_TYPES.CIRCLE_2D, properties)
-end
-
--- Create 3D circle
-function ESP:createCircle3D(properties)
-    return self:addDrawing(DRAW_TYPES.CIRCLE_3D, properties)
-end
-
--- Create 2D line
-function ESP:createLine2D(properties)
-    return self:addDrawing(DRAW_TYPES.LINE_2D, properties)
-end
-
--- Create 3D line
-function ESP:createLine3D(properties)
-    return self:addDrawing(DRAW_TYPES.LINE_3D, properties)
-end
-
--- Create text box
-function ESP:createText(properties)
-    return self:addDrawing(DRAW_TYPES.TEXT, properties)
-end
-
--- Hide all drawings in a category
-function ESP:hideCategory(category)
-    if self.categories[category] then
-        for _, drawing in ipairs(self.categories[category]) do
-            drawing.visible = false
-        end
-    end
-end
-
--- Show all drawings in a category
-function ESP:showCategory(category)
-    if self.categories[category] then
-        for _, drawing in ipairs(self.categories[category]) do
-            drawing.visible = true
-        end
-    end
-end
-
--- Remove a drawing
-function ESP:removeDrawing(drawing)
-    for i, d in ipairs(self.drawings) do
-        if d == drawing then
-            table.remove(self.drawings, i)
-            break
-        end
-    end
-end
-
--- Clear all drawings
-function ESP:clear()
-    self.drawings = {}
-    self.categories = {}
-    cleardrawcache()
-end
-
--- Render drawings of all types
-function ESP:renderDrawing(drawing)
-    if not drawing.visible then return end
+    if not drawing.visible then return drawing end
     local Camera = workspace.CurrentCamera
 
     local ScreenPoints = {}
@@ -667,18 +570,68 @@ function ESP:renderDrawing(drawing)
             })
         end
     end
+    
+    drawing.ScreenPoints = ScreenPoints
+
+    return drawing
+end
+
+-- Add drawing to library
+function ESP:addDrawing(drawType, properties)
+    local drawing = CreateDrawing(drawType, properties)
+    return drawing
+end
+
+-- Create 3D box
+function ESP:createBox3D(properties)
+    return self:addDrawing(DRAW_TYPES.BOX_3D, properties)
+end
+
+-- Create 2D rectangle
+function ESP:createRect2D(properties)
+    return self:addDrawing(DRAW_TYPES.RECT_2D, properties)
+end
+
+-- Create 3D rectangle
+function ESP:createRect3D(properties)
+    return self:addDrawing(DRAW_TYPES.RECT_3D, properties)
+end
+
+-- Create 2D circle
+function ESP:createCircle2D(properties)
+    return self:addDrawing(DRAW_TYPES.CIRCLE_2D, properties)
+end
+
+-- Create 3D circle
+function ESP:createCircle3D(properties)
+    return self:addDrawing(DRAW_TYPES.CIRCLE_3D, properties)
+end
+
+-- Create 2D line
+function ESP:createLine2D(properties)
+    return self:addDrawing(DRAW_TYPES.LINE_2D, properties)
+end
+
+-- Create 3D line
+function ESP:createLine3D(properties)
+    return self:addDrawing(DRAW_TYPES.LINE_3D, properties)
+end
+
+-- Create text box
+function ESP:createText(properties)
+    return self:addDrawing(DRAW_TYPES.TEXT, properties)
+end
+
+-- Clear all drawings
+function ESP:clear()
+    cleardrawcache()
 end
 
 -- Render all visible drawings (calls user-defined render functions)
 function ESP:render(doDrawings)
-    cleardrawcache()
+    self:clear()
     if doDrawings and type(doDrawings) == "function" then
         doDrawings()
-    end
-    for _, drawing in ipairs(self.drawings) do
-        if drawing.visible then
-            self:renderDrawing(drawing)
-        end
     end
 end
 
