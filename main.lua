@@ -626,8 +626,10 @@ function CreateDrawing(drawType, properties)
                 OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             })
 
+            print("text.Text", text.Text)
             text.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
-            text.Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or nil;
+            print("text.Font", text.Font)
+            text.Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.UI;
 
             print("text.Text", text.Text)
             print("text.TextBounds", text.TextBounds)
