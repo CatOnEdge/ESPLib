@@ -9,7 +9,7 @@
 
 local genv = getgenv()
 
-if not genv.Drawing then
+if not genv.Drawing or not genv.cleardrawcache then
     warn("Drawing is not supported with this executor!")
     return nil
 end
