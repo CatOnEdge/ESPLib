@@ -123,6 +123,29 @@ function GetRect2DCorners(p1: Vector2, p2: Vector2)
     }
 end
 
+function GetRect3DCorners(cf: CFrame, size: Vector3)
+    local hx, hy, hz = size.X/2, size.Y/2, size.Z/2
+
+    local offsets = {
+        Vector3.new(-hx, -hy, -hz),
+        Vector3.new(-hx, -hy,  hz),
+        Vector3.new(-hx,  hy, -hz),
+        Vector3.new(-hx,  hy,  hz),
+
+        Vector3.new( hx, -hy, -hz),
+        Vector3.new( hx, -hy,  hz),
+        Vector3.new( hx,  hy, -hz),
+        Vector3.new( hx,  hy,  hz),
+    }
+
+    local corners = {}
+    for i = 1, 8 do
+        corners[i] = cf * offsets[i]
+    end
+
+    return corners
+end
+
 function CalculateRect2D(object: BasePart|Model)
     if not object then return end
     local CF, Size
@@ -155,7 +178,7 @@ function CalculateRect2D(object: BasePart|Model)
 end
 ESP.CalculateRect2D = CalculateRect2D
 
-function CalculateQuad2D(object: BasePart|Model)
+function CalculateRect3D(object: BasePart|Model)
     if not object then return end
     local CF, Size
     if object:IsA("Model") then
@@ -189,7 +212,7 @@ function CalculateQuad2D(object: BasePart|Model)
 		OnScreen = OnScreen;
 	}
 end
-ESP.CalculateQuad2D = CalculateQuad2D
+ESP.CalculateRect3D = CalculateRect3D
 
 BOX_3D_EDGES = {
     {1,2}; {1,3}; {1,5};
@@ -282,10 +305,13 @@ function CreateDrawing(drawType, properties)
 
     local ScreenPoints = {}
     if drawing.type == DRAW_TYPES.BOX_3D then
-        local Pos1, Pos2 = drawing.data.Pos1, drawing.data.Pos2
-        assert(Pos1 and typeof(Pos1) == "Vector3", "[ERROR] drawing.data.Pos1 must be a Vector3!")
-        assert(Pos2 and typeof(Pos2) == "Vector3", "[ERROR] drawing.data.Pos2 must be a Vector3!")
-        local BoxCorners = GetBox3DCorners(Pos1, Pos2)
+        local BoxCorners = drawing.data.BoxCorners
+        assert(BoxCorners and type(BoxCorners) == "table", "[ERROR] drawing.data.BoxCorners must be a table!")
+        assert(#BoxCorners == 8, "[ERROR] #drawing.data.BoxCorners must be equal to 8!")
+        for i, v in ipairs(BoxCorners) do
+            assert(v and typeof(v) == "Vector3", "[ERROR] drawing.data.BoxCorners["..tostring(i).."] must be a Vector3!")
+        end
+
         -- Project all corners
         local projected = {}
         for i, corner in ipairs(BoxCorners) do
@@ -387,8 +413,21 @@ function CreateDrawing(drawType, properties)
         assert(QuadCorners and type(QuadCorners) == "table", "[ERROR] drawing.data.QuadCorners must be a table!")
         assert(#QuadCorners == 4, "[ERROR] #drawing.data.QuadCorners must be equal to 4!")
         for i, v in ipairs(QuadCorners) do
-            assert(v and typeof(v) == "Vector2", "[ERROR] drawing.data.QuadCorners["..tostring(i).."] must be a Vector2!")
+            assert(v and typeof(v) == "Vector3", "[ERROR] drawing.data.QuadCorners["..tostring(i).."] must be a Vector3!")
         end
+
+        -- Project all corners
+        local projected = {}
+        for i, corner in ipairs(QuadCorners) do
+            local screenPos, onScreen = Camera:WorldToViewportPoint(corner)
+            -- if not onScreen then
+            --     -- If ANY corner is off-screen, you can choose to skip drawing
+            --     -- or clamp it. For now, we skip.
+            --     return
+            -- end
+            projected[i] = Vector2.new(screenPos.X, screenPos.Y)
+        end
+        ScreenPoints = projected
 
         if drawing.visible then
             -- Filled Quad
@@ -399,10 +438,10 @@ function CreateDrawing(drawType, properties)
                 Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
                 Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Quad
-                PointA = QuadCorners[1];
-                PointB = QuadCorners[2];
-                PointC = QuadCorners[3];
-                PointD = QuadCorners[4];
+                PointA = ScreenPoints[1];
+                PointB = ScreenPoints[2];
+                PointC = ScreenPoints[3];
+                PointD = ScreenPoints[4];
                 Thickness = 1;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
             })
@@ -414,16 +453,14 @@ function CreateDrawing(drawType, properties)
                 Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Quad
-                PointA = QuadCorners[1];
-                PointB = QuadCorners[2];
-                PointC = QuadCorners[3];
-                PointD = QuadCorners[4];
+                PointA = ScreenPoints[1];
+                PointB = ScreenPoints[2];
+                PointC = ScreenPoints[3];
+                PointD = ScreenPoints[4];
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
                 Filled = false;
             })
         end
-
-        ScreenPoints = QuadCorners
     elseif drawing.type == DRAW_TYPES.CIRCLE_2D then
         local Pos = drawing.data.CenterPos
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.CenterPos must be a Vector2!")
