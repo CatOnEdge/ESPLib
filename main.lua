@@ -114,13 +114,13 @@ function GetRect2DAnchors(points)
     return {
         Center = Vector2.new(centerX, centerY);
 
-        TopLeft = Vector2.new(minX, maxY);
-        Top = Vector2.new(centerX, maxY);
-        TopRight = Vector2.new(maxX, maxY);
+        TopLeft = Vector2.new(minX, minY);
+        Top = Vector2.new(centerX, minY);
+        TopRight = Vector2.new(maxX, minY);
 
-        BottomLeft = Vector2.new(minX, minY);
-        Bottom = Vector2.new(centerX, minY);
-        BottomRight = Vector2.new(maxX, minY);
+        BottomLeft = Vector2.new(minX, maxY);
+        Bottom = Vector2.new(centerX, maxY);
+        BottomRight = Vector2.new(maxX, maxY);
 
         Left = Vector2.new(minX, centerY);
         Right = Vector2.new(maxX, centerY);
