@@ -376,7 +376,7 @@ function CreateDrawing(drawType, properties)
                         --BaseDrawingObject
                         Visible = true;
                         ZIndex = (drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 1);
-                        Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
+                        Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 0;
                         Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                         --Quad
                         PointA = A;
@@ -392,7 +392,7 @@ function CreateDrawing(drawType, properties)
                     --BaseDrawingObject
                     Visible = true;
                     ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 2;
-                    Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                    Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                     Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                     --Quad
                     PointA = A;
@@ -422,7 +422,7 @@ function CreateDrawing(drawType, properties)
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 1;
-                Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
+                Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 0;
                 Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Square
                 Size = Size;
@@ -435,7 +435,7 @@ function CreateDrawing(drawType, properties)
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 2;
-                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Square
                 Size = Size;
@@ -460,7 +460,7 @@ function CreateDrawing(drawType, properties)
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 1;
-                Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
+                Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 0;
                 Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Quad
                 PointA = ScreenPoints.TopLeft;
@@ -475,7 +475,7 @@ function CreateDrawing(drawType, properties)
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 2;
-                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Quad
                 PointA = ScreenPoints.TopLeft;
@@ -497,7 +497,7 @@ function CreateDrawing(drawType, properties)
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 1;
-                Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
+                Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 0;
                 Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Circle
                 NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
@@ -511,7 +511,7 @@ function CreateDrawing(drawType, properties)
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 2;
-                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Circle
                 NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
@@ -554,7 +554,7 @@ function CreateDrawing(drawType, properties)
                     --BaseDrawingObject
                     Visible = true;
                     ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 2;
-                    Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                    Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                     Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                     --Line
                     From = screen1;
@@ -573,7 +573,7 @@ function CreateDrawing(drawType, properties)
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 2;
-                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Line
                 From = Pos1;
@@ -597,7 +597,7 @@ function CreateDrawing(drawType, properties)
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 2;
-                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Line
                 From = screen1;
@@ -619,7 +619,7 @@ function CreateDrawing(drawType, properties)
             DropText.Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.Plex;
             DropText.Size = drawing.data.FontSize ~= nil and type(drawing.data.FontSize) == "number" and drawing.data.FontSize > 0 and drawing.data.FontSize or 14;
             DropText.ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 3;
-            DropText.Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+            DropText.Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
             DropText.Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
             DropText.OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             DropText.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
@@ -688,7 +688,7 @@ function CreateDrawing(drawType, properties)
                 --BaseDrawingObject
                 Visible = true;
                 ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 2;
-                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                 Color = color;
                 --Line
                 From = originPos;
