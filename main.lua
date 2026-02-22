@@ -384,7 +384,7 @@ function CreateDrawing(drawType, properties)
                         PointC = C;
                         PointD = D;
                         Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
-                        Thickness = 3;
+                        Thickness = 1;
                     })
                 end
                 -- Outline Quad
@@ -400,7 +400,7 @@ function CreateDrawing(drawType, properties)
                     PointC = C;
                     PointD = D;
                     Filled = false;
-                    Thickness = drawing.data.Thickness or 3;
+                    Thickness = drawing.data.Thickness or 1;
                 })
             end
         end
