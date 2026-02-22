@@ -387,20 +387,21 @@ function CreateDrawing(drawType, properties)
                         Thickness = 1;
                     })
                 end
-                -- Outline Quad
-                local Outline = AddDrawing("Quad", {
+            end
+            for _, edge in ipairs(BOX_3D_EDGES) do
+                local A = ScreenPoints[edge[1]]
+                local B = ScreenPoints[edge[2]]
+                -- Outline Line
+                local Outline = AddDrawing("Line", {
                     --BaseDrawingObject
                     Visible = true;
-                    ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 2;
+                    ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 2;
                     Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 1;
                     Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-                    --Quad
-                    PointA = A;
-                    PointB = B;
-                    PointC = C;
-                    PointD = D;
-                    Filled = false;
-                    Thickness = 1;
+                    --Line
+                    From = A;
+                    To = B;
+                    Thickness = drawing.data.Thickness or 3;
                 })
             end
         end
