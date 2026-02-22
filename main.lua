@@ -619,8 +619,6 @@ function CreateDrawing(drawType, properties)
                 Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Text
-                Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
-                Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or nil;
                 Size = drawing.data.FontSize ~= nil and type(drawing.data.FontSize) == "number" and drawing.data.FontSize > 0 and drawing.data.FontSize or 14;
                 Position = Pos;
                 Center = drawing.data.Center ~= nil and type(drawing.data.Center) == "boolean" and drawing.data.Center or true;
@@ -628,6 +626,10 @@ function CreateDrawing(drawType, properties)
                 OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             })
 
+            text.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
+            text.Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or nil;
+
+            print("text.Text", text.Text)
             print("text.TextBounds", text.TextBounds)
             print("text.Position", text.Position)
 
