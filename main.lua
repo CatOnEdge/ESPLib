@@ -670,8 +670,11 @@ function ESP:renderDrawing(drawing)
 end
 
 -- Render all visible drawings (calls user-defined render functions)
-function ESP:render()
+function ESP:render(doDrawings)
     cleardrawcache()
+    if doDrawings and type(doDrawings) == "function" then
+        doDrawings()
+    end
     for _, drawing in ipairs(self.drawings) do
         if drawing.visible then
             self:renderDrawing(drawing)
