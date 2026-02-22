@@ -384,7 +384,7 @@ function CreateDrawing(drawType, properties)
                         PointC = C;
                         PointD = D;
                         Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
-                        Thickness = 1;
+                        Thickness = 3;
                     })
                 end
                 -- Outline Quad
@@ -400,7 +400,7 @@ function CreateDrawing(drawType, properties)
                     PointC = C;
                     PointD = D;
                     Filled = false;
-                    Thickness = drawing.data.Thickness or 2;
+                    Thickness = drawing.data.Thickness or 3;
                 })
             end
         end
@@ -427,7 +427,7 @@ function CreateDrawing(drawType, properties)
                 --Square
                 Size = Size;
                 Position = Pos;
-                Thickness = 1;
+                Thickness = 3;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
             })
             -- Outline Square
@@ -467,7 +467,7 @@ function CreateDrawing(drawType, properties)
                 PointB = ScreenPoints.TopRight;
                 PointC = ScreenPoints.BottomRight;
                 PointD = ScreenPoints.BottomLeft;
-                Thickness = 1;
+                Thickness = 3;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
             })
             -- Outline Quad
@@ -503,7 +503,7 @@ function CreateDrawing(drawType, properties)
                 NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
                 Radius = Radius;
                 Position = Pos;
-                Thickness = 1;
+                Thickness = 3;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
             })
             -- Outline Circle
@@ -559,7 +559,7 @@ function CreateDrawing(drawType, properties)
                     --Line
                     From = screen1;
                     To = screen2;
-                    Thickness = drawing.data.Thickness or 1;
+                    Thickness = drawing.data.Thickness or 3;
                 })
             end
         end
@@ -578,7 +578,7 @@ function CreateDrawing(drawType, properties)
                 --Line
                 From = Pos1;
                 To = Pos2;
-                Thickness = drawing.data.Thickness or 1;
+                Thickness = drawing.data.Thickness or 3;
             })
         end
 
@@ -602,7 +602,7 @@ function CreateDrawing(drawType, properties)
                 --Line
                 From = screen1;
                 To = screen2;
-                Thickness = drawing.data.Thickness or 1;
+                Thickness = drawing.data.Thickness or 3;
             })
         end
 
@@ -623,22 +623,6 @@ function CreateDrawing(drawType, properties)
             DropText.Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
             DropText.OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             DropText.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
-            print("CHECK 1")
-            print("DropText.Text", DropText.Text)
-            print("DropText.Font", DropText.Font)
-            print("DropText.TextBounds", DropText.TextBounds)
-            print("DropText.Position", DropText.Position)
-            print("DropText.Size", DropText.Size)
-            print("CHECK 2")
-            print("DropText.Visible", DropText.Visible)
-            print("DropText.Center", DropText.Center)
-            print("DropText.Outline", DropText.Outline)
-            print("DropText.OutlineColor", DropText.OutlineColor)
-            print("DropText.Transparency", DropText.Transparency)
-            print("DropText.ZIndex", DropText.ZIndex)
-            print("DropText.Color", DropText.Color)
-            print("CHECK 3")
-
             DropText.Position = Pos;
 
             ScreenPoints = {
@@ -693,7 +677,7 @@ function CreateDrawing(drawType, properties)
                 --Line
                 From = originPos;
                 To = targetPos;
-                Thickness = drawing.data.Thickness or 1;
+                Thickness = drawing.data.Thickness or 3;
             })
         end
     end
