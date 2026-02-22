@@ -70,6 +70,7 @@ function GetMyDistanceSquared(position: Vector3): number?
     
     return a+b+c
 end
+ESP.GetMyDistanceSquared = GetMyDistanceSquared
 
 function GetMyDistance(position: Vector3): number?
     assert(position, "[ERROR] GetMyDistance must be passed a Vector3!")
@@ -77,11 +78,13 @@ function GetMyDistance(position: Vector3): number?
     if not distSquared then return nil end
 	return math.sqrt(distSquared)
 end
+ESP.GetMyDistance = GetMyDistance
 
 function RoundUp(n: number): number
     assert(n and type(n) == "number", "[ERROR] RoundUp must be passed a number!")
     return math.floor(n + 0.5)
 end
+ESP.RoundUp = RoundUp
 
 function GetBox3DCorners(p1: Vector3, p2: Vector3)
     return {
@@ -97,19 +100,45 @@ function GetBox3DCorners(p1: Vector3, p2: Vector3)
     }
 end
 
-function CalculateRect2DFromModel(Model: Model)
-	if not Model then return end
-	local CFrame, Size = Model:GetBoundingBox()
+function CalculateBox3D(object: BasePart|Model)
+    if not object then return end
+    local CF, Size
+    if object:IsA("Model") then
+        CF, Size = object:GetBoundingBox()
+    elseif object:IsA("BasePart") then
+        CF = object.CFrame
+        Size = object.Size
+    end
+	
+    local Pos1 = CF * CFrame.new(-Size.X/2, -Size.Y/2, -Size.Z/2)
+    local Pos2 = CF * CFrame.new(Size.X/2, Size.Y/2, Size.Z/2)
+
+    return {
+        Pos1 = Pos1;
+        Pos2 = Pos2;
+    }
+end
+ESP.CalculateBox3D = CalculateBox3D
+
+function CalculateRect2D(object: BasePart|Model)
+    if not object then return end
+    local CF, Size
+    if object:IsA("Model") then
+        CF, Size = object:GetBoundingBox()
+    elseif object:IsA("BasePart") then
+        CF = object.CFrame
+        Size = object.Size
+    end
 	local Camera = workspace.CurrentCamera
 	
 	local CornerTable = {
-		TopLeft = Camera:WorldToViewportPoint(Vector3.new(CFrame.X - Size.X / 2, CFrame.Y + Size.Y / 2, CFrame.Z)),
-		TopRight = Camera:WorldToViewportPoint(Vector3.new(CFrame.X + Size.X / 2, CFrame.Y + Size.Y / 2, CFrame.Z)),
-		BottomLeft = Camera:WorldToViewportPoint(Vector3.new(CFrame.X - Size.X / 2, CFrame.Y - Size.Y / 2, CFrame.Z)),
-		BottomRight = Camera:WorldToViewportPoint(Vector3.new(CFrame.X + Size.X / 2, CFrame.Y - Size.Y / 2, CFrame.Z))
+		TopLeft = Camera:WorldToViewportPoint(Vector3.new(CF.X - Size.X / 2, CF.Y + Size.Y / 2, CF.Z)),
+		TopRight = Camera:WorldToViewportPoint(Vector3.new(CF.X + Size.X / 2, CF.Y + Size.Y / 2, CF.Z)),
+		BottomLeft = Camera:WorldToViewportPoint(Vector3.new(CF.X - Size.X / 2, CF.Y - Size.Y / 2, CF.Z)),
+		BottomRight = Camera:WorldToViewportPoint(Vector3.new(CF.X + Size.X / 2, CF.Y - Size.Y / 2, CF.Z))
 	}
 	
-	local WorldPosition, OnScreen = Camera:WorldToViewportPoint(CFrame.Position)
+	local WorldPosition, OnScreen = Camera:WorldToViewportPoint(CF.Position)
 	local ScreenSize = Vector2.new((CornerTable.TopLeft - CornerTable.TopRight).Magnitude, (CornerTable.TopLeft - CornerTable.BottomLeft).Magnitude)
     local ScreenPosition = Vector2.new(WorldPosition.X - ScreenSize.X / 2, WorldPosition.Y - ScreenSize.Y / 2)
 	return {
@@ -119,6 +148,7 @@ function CalculateRect2DFromModel(Model: Model)
 		OnScreen = OnScreen;
 	}
 end
+ESP.CalculateRect2D = CalculateRect2D
 
 function GetRect2DCorners(p1: Vector2, p2: Vector2)
     return {
@@ -157,6 +187,7 @@ FONTS = {
     Plex = 2;
     Monospace = 3;
 }
+ESP.FONTS = FONTS
 
 PI = math.pi;
 
@@ -308,16 +339,6 @@ function ESP:clear()
     self.drawings = {}
     self.categories = {}
     cleardrawcache()
-end
-
--- Render all visible drawings (calls user-defined render functions)
-function ESP:render()
-    cleardrawcache()
-    for _, drawing in ipairs(self.drawings) do
-        if drawing.visible then
-            self:renderDrawing(drawing)
-        end
-    end
 end
 
 -- Render drawings of all types
@@ -640,6 +661,16 @@ function ESP:renderDrawing(drawing)
                 To = targetPos;
                 Thickness = drawing.data.Thickness or 1;
             })
+        end
+    end
+end
+
+-- Render all visible drawings (calls user-defined render functions)
+function ESP:render()
+    cleardrawcache()
+    for _, drawing in ipairs(self.drawings) do
+        if drawing.visible then
+            self:renderDrawing(drawing)
         end
     end
 end
