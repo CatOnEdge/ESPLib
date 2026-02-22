@@ -627,11 +627,13 @@ function CreateDrawing(drawType, properties)
             })
 
             text.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
+            print("CHECK 1")
             print("text.Text", text.Text)
             print("text.Font", text.Font)
             print("text.TextBounds", text.TextBounds)
             print("text.Position", text.Position)
             print("text.Size", text.Size)
+            print("CHECK 2")
             print("text.Visible", text.Visible)
             print("text.Center", text.Center)
             print("text.Outline", text.Outline)
@@ -639,6 +641,7 @@ function CreateDrawing(drawType, properties)
             print("text.Transparency", text.Transparency)
             print("text.ZIndex", text.ZIndex)
             print("text.Color", text.Color)
+            print("CHECK 3")
 
             ScreenPoints = {
                 Pos + Vector2.new(-text.TextBounds.X/2, -text.TextBounds.X/2);
