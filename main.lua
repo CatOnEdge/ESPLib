@@ -751,7 +751,7 @@ end
 
 -- Clear all drawings
 function ESP:clear()
-    cleardrawcache()
+    -- cleardrawcache()
 end
 
 -- Render all visible drawings (calls user-defined render functions)
