@@ -9,6 +9,11 @@
 
 local genv = getgenv()
 
+if not genv.Drawing then
+    warn("Drawing is not supported with this executor!")
+    return nil
+end
+
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -36,12 +41,14 @@ TRACER_ORIGINS = {
     TOP = "top";
     CENTER = "center";
 }
+ESP.TRACER_ORIGINS = TRACER_ORIGINS
 
 TRACER_TARGETS = {
     CENTER = "center";
     TOP = "top";
     BOTTOM = "bottom";
 }
+ESP.TRACER_TARGETS = TRACER_TARGETS
 
 -- Helpers
 function AddDrawing(Type, Properties)
@@ -189,7 +196,7 @@ FONTS = {
 }
 ESP.FONTS = FONTS
 
-PI = math.pi;
+PI = math.pi
 
 function IsFaceVisible(pA, pB, pC)
     local AB = pB - pA
