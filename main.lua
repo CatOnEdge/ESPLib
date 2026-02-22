@@ -319,7 +319,7 @@ function IsFaceVisible(pA, pB, pC)
     return crossZ > 0 -- positive = facing camera (completely based on winding order)
 end
 
-function CountList(list)
+genv.CountList = genv.CountList or function(list)
     local count = 0
     for _, _ in pairs(list) do
         count += 1
