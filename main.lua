@@ -629,7 +629,11 @@ function CreateDrawing(drawType, properties)
             })
 
             print(text)
-            print(repr(text), reprSettings)
+            local drawingproperties = {}
+            for i, v in pairs(text) do
+                drawingproperties[i] = v
+            end
+            print(repr(drawingproperties), reprSettings)
 
             ScreenPoints = {
                 Pos + Vector2.new(-text.TextBounds.X/2, -text.TextBounds.X/2);
