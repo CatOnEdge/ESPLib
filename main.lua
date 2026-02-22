@@ -600,9 +600,8 @@ function CreateDrawing(drawType, properties)
 
         ScreenPoints = {screen1, screen2}
     elseif drawing.type == DRAW_TYPES.TEXT then
-        local Pos, TextBounds = drawing.data.Pos, drawing.data.TextBounds
+        local Pos = drawing.data.Pos
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
-        assert(TextBounds and typeof(TextBounds) == "Vector2", "[ERROR] drawing.data.Size must be a Vector2!")
 
         if drawing.visible then
             local text = AddDrawing("Text", {
@@ -613,7 +612,6 @@ function CreateDrawing(drawType, properties)
                 Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
                 --Text
                 Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
-                TextBounds = TextBounds;
                 Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.UI;
                 Size = drawing.data.FontSize ~= nil and type(drawing.data.FontSize) == "number" and drawing.data.FontSize > 0 and drawing.data.FontSize or 12;
                 Position = Pos;
@@ -621,60 +619,62 @@ function CreateDrawing(drawType, properties)
                 Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or false;
                 OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new(0,0,0);
             })
+
+             ScreenPoints = {
+                Pos + Vector2.new(-text.TextBounds.X/2, -text.TextBounds.X/2);
+                Pos + Vector2.new(-text.TextBounds.X/2, text.TextBounds.X/2);
+                Pos + Vector2.new(text.TextBounds.X/2, text.TextBounds.X/2);
+                Pos + Vector2.new(text.TextBounds.X/2, -text.TextBounds.X/2);
+            }
         end
-        
-        ScreenPoints = {
-            Pos + Vector2.new(-TextBounds.X/2, -TextBounds.X/2);
-            Pos + Vector2.new(-TextBounds.X/2, TextBounds.X/2);
-            Pos + Vector2.new(TextBounds.X/2, TextBounds.X/2);
-            Pos + Vector2.new(TextBounds.X/2, -TextBounds.X/2);
-        }
     end
 
-    drawing.ScreenPoints = ScreenPoints
-    drawing.Anchors = drawing.data.Anchors or GetRect2DAnchors(ScreenPoints)
+    if ScreenPoints then
+        drawing.ScreenPoints = ScreenPoints
+        drawing.Anchors = drawing.data.Anchors or GetRect2DAnchors(ScreenPoints)
 
-    if drawing.tracer ~= nil and type(drawing.tracer) == "table" then
-        local origin = drawing.tracer.origin ~= nil and type(drawing.tracer.origin) == "string" and drawing.tracer.origin or TRACER_ORIGINS.MOUSE;
-        local target = drawing.tracer.target ~= nil and type(drawing.tracer.target) == "string" and drawing.tracer.target or TRACER_TARGETS.CENTER;
-        local color = drawing.tracer.color ~= nil and typeof(drawing.tracer.color) == "Color3" and drawing.tracer.color or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+        if drawing.tracer ~= nil and type(drawing.tracer) == "table" then
+            local origin = drawing.tracer.origin ~= nil and type(drawing.tracer.origin) == "string" and drawing.tracer.origin or TRACER_ORIGINS.MOUSE;
+            local target = drawing.tracer.target ~= nil and type(drawing.tracer.target) == "string" and drawing.tracer.target or TRACER_TARGETS.CENTER;
+            local color = drawing.tracer.color ~= nil and typeof(drawing.tracer.color) == "Color3" and drawing.tracer.color or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
 
-        local originPos: Vector2
-        local targetPos: Vector2
+            local originPos: Vector2
+            local targetPos: Vector2
 
-        if origin == TRACER_ORIGINS.MOUSE then
-            originPos = UserInputService:GetMouseLocation()
-        else
-            local ViewportSize = Camera.ViewportSize
-            local Center = Vector2.new(ViewportSize.X/2, ViewportSize.Y/2)
-            if origin == TRACER_ORIGINS.CENTER then
-                originPos = Center
-            elseif origin == TRACER_ORIGINS.BOTTOM then
-                originPos = Center + Vector2.yAxis * ViewportSize.Y * 0.8;
-            elseif origin == TRACER_ORIGINS.TOP then
-                originPos = Center - Vector2.yAxis * ViewportSize.Y * 0.8;
+            if origin == TRACER_ORIGINS.MOUSE then
+                originPos = UserInputService:GetMouseLocation()
+            else
+                local ViewportSize = Camera.ViewportSize
+                local Center = Vector2.new(ViewportSize.X/2, ViewportSize.Y/2)
+                if origin == TRACER_ORIGINS.CENTER then
+                    originPos = Center
+                elseif origin == TRACER_ORIGINS.BOTTOM then
+                    originPos = Center + Vector2.yAxis * ViewportSize.Y * 0.8;
+                elseif origin == TRACER_ORIGINS.TOP then
+                    originPos = Center - Vector2.yAxis * ViewportSize.Y * 0.8;
+                end
             end
-        end
 
-        if target == TRACER_TARGETS.CENTER then
-            targetPos = drawing.Anchors.Center
-        elseif target == TRACER_TARGETS.BOTTOM then
-            targetPos = drawing.Anchors.Bottom
-        elseif target == TRACER_TARGETS.TOP then
-            targetPos = drawing.Anchors.Top
-        end
+            if target == TRACER_TARGETS.CENTER then
+                targetPos = drawing.Anchors.Center
+            elseif target == TRACER_TARGETS.BOTTOM then
+                targetPos = drawing.Anchors.Bottom
+            elseif target == TRACER_TARGETS.TOP then
+                targetPos = drawing.Anchors.Top
+            end
 
-        local tracer = AddDrawing("Line", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
-            Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-            Color = color;
-            --Line
-            From = originPos;
-            To = targetPos;
-            Thickness = drawing.data.Thickness or 1;
-        })
+            local tracer = AddDrawing("Line", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Color = color;
+                --Line
+                From = originPos;
+                To = targetPos;
+                Thickness = drawing.data.Thickness or 1;
+            })
+        end
     end
 
     return drawing
