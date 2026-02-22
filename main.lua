@@ -233,6 +233,7 @@ function CreateDrawing(drawType, properties)
     
     local drawing = {
         type = drawType;
+        visible = properties.visible ~= false and true or false;
         color = properties.color or Color3.new(1,1,1);
         tracer = properties.tracer or nil;
         data = properties.data or {};
@@ -267,77 +268,84 @@ function CreateDrawing(drawType, properties)
             projected[i] = Vector2.new(screenPos.X, screenPos.Y)
         end
         ScreenPoints = projected
-        -- Draw visible faces
-        for _, face in ipairs(BOX_3D_FACES) do
-            local A = projected[face[1]]
-            local B = projected[face[2]]
-            local C = projected[face[3]]
-            local D = projected[face[4]]
-            -- Cull backfaces
-            if IsFaceVisible(A, B, C) then
-                local QuadCorners = {A, B, C, D}
-                -- Filled Quad
-                local Main = AddDrawing("Quad", {
-                    --BaseDrawingObject
-                    Visible = true;
-                    ZIndex = (drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 1) + 1;
-                    Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
-                    Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-                    --Quad
-                    PointA = A;
-                    PointB = B;
-                    PointC = C;
-                    PointD = D;
-                    Filled = drawing.data.Filled or true;
-                    Thickness = 1;
-                })
-                -- Outline Quad
-                local Outline = AddDrawing("Quad", {
-                    --BaseDrawingObject
-                    Visible = true;
-                    ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 1;
-                    Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-                    Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-                    --Quad
-                    PointA = A;
-                    PointB = B;
-                    PointC = C;
-                    PointD = D;
-                    Filled = false;
-                    Thickness = drawing.data.Thickness or 2;
-                })
+
+        if drawing.visible then
+            -- Draw visible faces
+            for _, face in ipairs(BOX_3D_FACES) do
+                local A = projected[face[1]]
+                local B = projected[face[2]]
+                local C = projected[face[3]]
+                local D = projected[face[4]]
+                -- Cull backfaces
+                if IsFaceVisible(A, B, C) then
+                    local QuadCorners = {A, B, C, D}
+                    -- Filled Quad
+                    local Main = AddDrawing("Quad", {
+                        --BaseDrawingObject
+                        Visible = true;
+                        ZIndex = (drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 1) + 1;
+                        Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
+                        Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                        --Quad
+                        PointA = A;
+                        PointB = B;
+                        PointC = C;
+                        PointD = D;
+                        Filled = drawing.data.Filled or true;
+                        Thickness = 1;
+                    })
+                    -- Outline Quad
+                    local Outline = AddDrawing("Quad", {
+                        --BaseDrawingObject
+                        Visible = true;
+                        ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 1;
+                        Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                        Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                        --Quad
+                        PointA = A;
+                        PointB = B;
+                        PointC = C;
+                        PointD = D;
+                        Filled = false;
+                        Thickness = drawing.data.Thickness or 2;
+                    })
+                end
             end
         end
     elseif drawing.type == DRAW_TYPES.RECT_2D then
         local Pos, Size = drawing.data.Pos, drawing.data.Size
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
         assert(Size and typeof(Size) == "Vector2", "[ERROR] drawing.data.Size must be a Vector2!")
-        -- Filled Square
-        local Main = AddDrawing("Square", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 1;
-            Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
-            Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            --Square
-            Size = Size;
-            Position = Pos;
-            Thickness = 1;
-            Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
-        })
-        -- Outline Square
-        local Outline = AddDrawing("Square", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
-            Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-            Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            --Square
-            Size = Size;
-            Position = Pos;
-            Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
-            Filled = false;
-        })
+
+        if drawing.visible then
+            -- Filled Square
+            local Main = AddDrawing("Square", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 1;
+                Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
+                Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                --Square
+                Size = Size;
+                Position = Pos;
+                Thickness = 1;
+                Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
+            })
+            -- Outline Square
+            local Outline = AddDrawing("Square", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                --Square
+                Size = Size;
+                Position = Pos;
+                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
+                Filled = false;
+            })
+        end
+
         ScreenPoints = {
             Pos + Vector2.new(-Size.X/2, -Size.X/2);
             Pos + Vector2.new(-Size.X/2, Size.X/2);
@@ -351,69 +359,77 @@ function CreateDrawing(drawType, properties)
         for i, v in ipairs(QuadCorners) do
             assert(v and typeof(v) == "Vector2", "[ERROR] drawing.data.QuadCorners["..tostring(i).."] must be a Vector2!")
         end
-        -- Filled Quad
-        local Main = AddDrawing("Quad", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 1;
-            Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
-            Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            --Quad
-            PointA = QuadCorners[1];
-            PointB = QuadCorners[2];
-            PointC = QuadCorners[3];
-            PointD = QuadCorners[4];
-            Thickness = 1;
-            Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
-        })
-        -- Outline Quad
-        local Outline = AddDrawing("Quad", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
-            Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-            Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            --Quad
-            PointA = QuadCorners[1];
-            PointB = QuadCorners[2];
-            PointC = QuadCorners[3];
-            PointD = QuadCorners[4];
-            Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
-            Filled = false;
-        })
+
+        if drawing.visible then
+            -- Filled Quad
+            local Main = AddDrawing("Quad", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 1;
+                Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
+                Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                --Quad
+                PointA = QuadCorners[1];
+                PointB = QuadCorners[2];
+                PointC = QuadCorners[3];
+                PointD = QuadCorners[4];
+                Thickness = 1;
+                Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
+            })
+            -- Outline Quad
+            local Outline = AddDrawing("Quad", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                --Quad
+                PointA = QuadCorners[1];
+                PointB = QuadCorners[2];
+                PointC = QuadCorners[3];
+                PointD = QuadCorners[4];
+                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
+                Filled = false;
+            })
+        end
+
         ScreenPoints = QuadCorners
     elseif drawing.type == DRAW_TYPES.CIRCLE_2D then
         local Pos = drawing.data.CenterPos
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.CenterPos must be a Vector2!")
         local Radius = drawing.data.Radius ~= nil and type(drawing.data.Radius) == "number" and drawing.data.Radius> 0 and drawing.data.Radius or 16;
-        -- Filled Circle
-        local Main = AddDrawing("Circle", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 1;
-            Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
-            Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            --Circle
-            NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
-            Radius = Radius;
-            Position = Pos;
-            Thickness = 1;
-            Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
-        })
-        -- Outline Circle
-        local Outline = AddDrawing("Circle", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
-            Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-            Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            --Circle
-            NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
-            Radius = Radius;
-            Position = Pos;
-            Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
-            Filled = false
-        })
+
+        if drawing.visible then
+            -- Filled Circle
+            local Main = AddDrawing("Circle", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex + 1 or 1;
+                Transparency = drawing.data.FillTransparency ~= nil and type(drawing.data.FillTransparency) == "number" and drawing.data.FillTransparency >= 0 and drawing.data.FillTransparency <= 1 and drawing.data.FillTransparency or 1;
+                Color = drawing.data.FillColor or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                --Circle
+                NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
+                Radius = Radius;
+                Position = Pos;
+                Thickness = 1;
+                Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
+            })
+            -- Outline Circle
+            local Outline = AddDrawing("Circle", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                --Circle
+                NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
+                Radius = Radius;
+                Position = Pos;
+                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
+                Filled = false
+            })
+        end
+
         ScreenPoints = {
             Pos;
             Pos + Vector2.yAxis * Radius;
@@ -441,7 +457,7 @@ function CreateDrawing(drawType, properties)
             table.insert(ScreenPoints, Vector2.new(screen1.X, screen1.Y))
             local screen2 = Camera:WorldToViewportPoint(p2_world)
 
-            if screen1 and screen2 then
+            if screen1 and screen2 and drawing.visible then
                 local line = AddDrawing("Line", {
                     --BaseDrawingObject
                     Visible = true;
@@ -459,17 +475,21 @@ function CreateDrawing(drawType, properties)
         local Pos1, Pos2 = drawing.data.Pos1, drawing.data.Pos2
         assert(Pos1 and typeof(Pos1) == "Vector2", "[ERROR] drawing.data.Pos1 must be a Vector2!")
         assert(Pos2 and typeof(Pos2) == "Vector2", "[ERROR] drawing.data.Pos2 must be a Vector2!")
-        local line = AddDrawing("Line", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
-            Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-            Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            --Line
-            From = Pos1;
-            To = Pos2;
-            Thickness = drawing.data.Thickness or 1;
-        })
+
+        if drawing.visible then
+            local line = AddDrawing("Line", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                --Line
+                From = Pos1;
+                To = Pos2;
+                Thickness = drawing.data.Thickness or 1;
+            })
+        end
+
         ScreenPoints = {Pos1, Pos2}
     elseif drawing.type == DRAW_TYPES.LINE_3D then
         local Pos1, Pos2 = drawing.data.Pos1, drawing.data.Pos2
@@ -480,38 +500,45 @@ function CreateDrawing(drawType, properties)
         local screen1 = Camera:WorldToViewportPoint(Pos1)
         local screen2 = Camera:WorldToViewportPoint(Pos2)
 
-        local line = AddDrawing("Line", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
-            Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-            Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            --Line
-            From = screen1;
-            To = screen2;
-            Thickness = drawing.data.Thickness or 1;
-        })
+        if drawing.visible then
+            local line = AddDrawing("Line", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                --Line
+                From = screen1;
+                To = screen2;
+                Thickness = drawing.data.Thickness or 1;
+            })
+        end
+
         ScreenPoints = {screen1, screen2}
     elseif drawing.type == DRAW_TYPES.TEXT then
         local Pos, TextBounds = drawing.data.Pos, drawing.data.TextBounds
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
         assert(TextBounds and typeof(TextBounds) == "Vector2", "[ERROR] drawing.data.Size must be a Vector2!")
-        local text = AddDrawing("Text", {
-            --BaseDrawingObject
-            Visible = true;
-            ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
-            Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
-            Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
-            --Text
-            Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
-            TextBounds = TextBounds;
-            Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.UI;
-            Size = drawing.data.FontSize ~= nil and type(drawing.data.FontSize) == "number" and drawing.data.FontSize > 0 and drawing.data.FontSize or 12;
-            Position = Pos;
-            Center = drawing.data.Center ~= nil and type(drawing.data.Center) == "boolean" and drawing.data.Center or true;
-            Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or false;
-            OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new(0,0,0);
-        })
+
+        if drawing.visible then
+            local text = AddDrawing("Text", {
+                --BaseDrawingObject
+                Visible = true;
+                ZIndex = drawing.data.ZIndex ~= nil and type(drawing.data.ZIndex) == "number" and drawing.data.ZIndex or 0;
+                Transparency = drawing.data.Transparency ~= nil and type(drawing.data.Transparency) == "number" and drawing.data.Transparency >= 0 and drawing.data.Transparency <= 1 and drawing.data.Transparency or 0;
+                Color = drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
+                --Text
+                Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
+                TextBounds = TextBounds;
+                Font = drawing.data.Font ~= nil and type(drawing.data.Font) == "number" and drawing.data.Font >= 0 and drawing.data.Font <= 3 and drawing.data.Font or FONTS.UI;
+                Size = drawing.data.FontSize ~= nil and type(drawing.data.FontSize) == "number" and drawing.data.FontSize > 0 and drawing.data.FontSize or 12;
+                Position = Pos;
+                Center = drawing.data.Center ~= nil and type(drawing.data.Center) == "boolean" and drawing.data.Center or true;
+                Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or false;
+                OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new(0,0,0);
+            })
+        end
+        
         ScreenPoints = {
             Pos + Vector2.new(-TextBounds.X/2, -TextBounds.X/2);
             Pos + Vector2.new(-TextBounds.X/2, TextBounds.X/2);
