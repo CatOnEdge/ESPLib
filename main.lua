@@ -61,7 +61,12 @@ SELECTABLE_TRACER_TARGETS = ESP.SELECTABLE_TRACER_TARGETS or {
 function AddDrawing(Type, Properties)
     local Drawing = Drawing.new(Type)
     for Index, Property in pairs(Properties) do
-        Drawing[Index] = Property
+        local success, err = pcall(function()
+            Drawing[Index] = Property
+        end)
+        if not success then
+            warn("[ERROR] DrawingProperty: ", Index, "Value:", Property, err)
+        end
     end
     return Drawing
 end
