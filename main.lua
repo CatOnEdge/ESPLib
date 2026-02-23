@@ -415,7 +415,7 @@ function CreateDrawing(drawType, properties)
                     --Line
                     From = A;
                     To = B;
-                    Thickness = drawing.data.Thickness or 3;
+                    Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 3;
                 })
             end
         end
@@ -457,7 +457,7 @@ function CreateDrawing(drawType, properties)
                 PointB = ScreenPoints.TopLeft;
                 PointC = ScreenPoints.BottomLeft;
                 PointD = ScreenPoints.BottomRight;
-                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
+                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 3;
                 Filled = false;
             })
         end
@@ -499,7 +499,7 @@ function CreateDrawing(drawType, properties)
                 PointB = ScreenPoints.TopLeft;
                 PointC = ScreenPoints.BottomLeft;
                 PointD = ScreenPoints.BottomRight;
-                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
+                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 3;
                 Filled = false;
             })
         end
@@ -534,7 +534,7 @@ function CreateDrawing(drawType, properties)
                 NumSides = drawing.data.NumSides ~= nil and type(drawing.data.NumSides) == "number" and drawing.data.NumSides > 0 and drawing.data.NumSides or 16;
                 Radius = Radius;
                 Position = Pos;
-                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 or 3;
+                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 3;
                 Filled = false
             })
         end
@@ -576,7 +576,7 @@ function CreateDrawing(drawType, properties)
                     --Line
                     From = screen1;
                     To = screen2;
-                    Thickness = drawing.data.Thickness or 3;
+                    Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 3;
                 })
             end
         end
@@ -595,7 +595,7 @@ function CreateDrawing(drawType, properties)
                 --Line
                 From = Pos1;
                 To = Pos2;
-                Thickness = drawing.data.Thickness or 3;
+                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 3;
             })
         end
 
@@ -619,7 +619,7 @@ function CreateDrawing(drawType, properties)
                 --Line
                 From = screen1;
                 To = screen2;
-                Thickness = drawing.data.Thickness or 3;
+                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 3;
             })
         end
 
@@ -694,7 +694,7 @@ function CreateDrawing(drawType, properties)
                 --Line
                 From = originPos;
                 To = targetPos;
-                Thickness = drawing.data.Thickness or 3;
+                Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 3;
             })
         end
     end
