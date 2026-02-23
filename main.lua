@@ -33,35 +33,29 @@ DRAW_TYPES = {
 }
 
 -- Tracer configuration
-TRACER_ORIGINS = {
-    MOUSE = "mouse";
-    BOTTOM = "bottom";
-    TOP = "top";
-    CENTER = "center";
+TRACER_ORIGINS = ESP.TRACER_ORIGINS or {
+    Mouse = "Mouse";
+    Bottom = "Bottom";
+    Top = "Top";
+    Center = "Center";
 }
-ESP.TRACER_ORIGINS = TRACER_ORIGINS
+SELECTABLE_TRACER_ORIGINS = ESP.SELECTABLE_TRACER_ORIGINS or {
+    [1] = TRACER_ORIGINS.Mouse;
+    [2] = TRACER_ORIGINS.Bottom;
+    [3] = TRACER_ORIGINS.Top;
+    [4] = TRACER_ORIGINS.Center;
+}
 
-TRACER_TARGETS = {
-    CENTER = "center";
-    TOP = "top";
-    BOTTOM = "bottom";
+TRACER_TARGETS = ESP.TRACER_TARGETS or {
+    Center = "Center";
+    Top = "Top";
+    Bottom = "Bottom";
 }
-ESP.TRACER_TARGETS = TRACER_TARGETS
-
-SELECTABLE_TRACER_ORIGINS = {
-    [1] = TRACER_ORIGINS.MOUSE;
-    [2] = TRACER_ORIGINS.BOTTOM;
-    [3] = TRACER_ORIGINS.TOP;
-    [4] = TRACER_ORIGINS.CENTER;
+SELECTABLE_TRACER_TARGETS = ESP.SELECTABLE_TRACER_TARGETS or {
+    [1] = TRACER_TARGETS.Center;
+    [2] = TRACER_TARGETS.Top;
+    [3] = TRACER_TARGETS.Bottom;
 }
-ESP.SELECTABLE_TRACER_ORIGINS = SELECTABLE_TRACER_ORIGINS
-
-SELECTABLE_TRACER_TARGETS = {
-    [1] = TRACER_TARGETS.CENTER;
-    [2] = TRACER_TARGETS.TOP;
-    [3] = TRACER_TARGETS.BOTTOM;
-}
-ESP.SELECTABLE_TRACER_TARGETS = SELECTABLE_TRACER_TARGETS
 
 -- Helpers
 function AddDrawing(Type, Properties)
@@ -357,8 +351,8 @@ function CreateDrawing(drawType, properties)
     -- Tracer configuration
     if properties.tracer then
         drawing.tracer = {
-            origin = properties.tracer.origin or TRACER_ORIGINS.MOUSE;
-            target = properties.tracer.target or TRACER_TARGETS.CENTER;
+            origin = properties.tracer.origin or TRACER_ORIGINS.Mouse;
+            target = properties.tracer.target or TRACER_TARGETS.Center;
             color = properties.tracer.color or drawing.color;
         }
     end
@@ -657,32 +651,32 @@ function CreateDrawing(drawType, properties)
         drawing.Anchors = drawing.data.Anchors or GetRect2DAnchors(ScreenPoints)
 
         if drawing.tracer ~= nil and type(drawing.tracer) == "table" then
-            local origin = drawing.tracer.origin ~= nil and type(drawing.tracer.origin) == "string" and drawing.tracer.origin or TRACER_ORIGINS.MOUSE;
-            local target = drawing.tracer.target ~= nil and type(drawing.tracer.target) == "string" and drawing.tracer.target or TRACER_TARGETS.CENTER;
+            local origin = drawing.tracer.origin ~= nil and type(drawing.tracer.origin) == "string" and drawing.tracer.origin or TRACER_ORIGINS.Mouse;
+            local target = drawing.tracer.target ~= nil and type(drawing.tracer.target) == "string" and drawing.tracer.target or TRACER_TARGETS.Center;
             local color = drawing.tracer.color ~= nil and typeof(drawing.tracer.color) == "Color3" and drawing.tracer.color or drawing.color ~= nil and typeof(drawing.color) == "Color3" and drawing.color or Color3.new(1,1,1);
 
             local originPos: Vector2
             local targetPos: Vector2
 
-            if origin == TRACER_ORIGINS.MOUSE then
+            if origin == TRACER_ORIGINS.Mouse then
                 originPos = UserInputService:GetMouseLocation()
             else
                 local ViewportSize = Camera.ViewportSize
                 local Center = Vector2.new(ViewportSize.X/2, ViewportSize.Y/2)
-                if origin == TRACER_ORIGINS.CENTER then
+                if origin == TRACER_ORIGINS.Center then
                     originPos = Center
-                elseif origin == TRACER_ORIGINS.BOTTOM then
+                elseif origin == TRACER_ORIGINS.Bottom then
                     originPos = Center + Vector2.yAxis * ViewportSize.Y * 0.8;
-                elseif origin == TRACER_ORIGINS.TOP then
+                elseif origin == TRACER_ORIGINS.Top then
                     originPos = Center - Vector2.yAxis * ViewportSize.Y * 0.8;
                 end
             end
 
-            if target == TRACER_TARGETS.CENTER then
+            if target == TRACER_TARGETS.Center then
                 targetPos = drawing.Anchors.Center
-            elseif target == TRACER_TARGETS.BOTTOM then
+            elseif target == TRACER_TARGETS.Bottom then
                 targetPos = drawing.Anchors.Bottom
-            elseif target == TRACER_TARGETS.TOP then
+            elseif target == TRACER_TARGETS.Top then
                 targetPos = drawing.Anchors.Top
             end
 
