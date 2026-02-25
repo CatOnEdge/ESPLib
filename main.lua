@@ -342,7 +342,7 @@ genv.CountList = genv.CountList or function(list)
 end
 
 -- Drawing object constructor
-function CreateDrawing(drawType, properties)
+function CreateDrawing(drawType, properties, PreExistingDrawing)
     properties = properties or {}
     
     local drawing = {
@@ -351,7 +351,7 @@ function CreateDrawing(drawType, properties)
         color = properties.color or Color3.new(1,1,1);
         tracer = properties.tracer or nil;
         data = properties.data or {};
-        drawingObjects = {};
+        drawingObjects = PreExistingDrawing and PreExistingDrawing.drawingObjects or {};
     }
     
     -- Tracer configuration
@@ -717,49 +717,63 @@ function CreateDrawing(drawType, properties)
 end
 
 -- Add drawing to library
-function ESP:addDrawing(drawType, properties)
-    local drawing = CreateDrawing(drawType, properties)
+function ESP:addDrawing(drawType, properties, PreExistingDrawing)
+    local drawing = CreateDrawing(drawType, properties, PreExistingDrawing)
     return drawing
 end
 
 -- Create 3D box
-function ESP:createBox3D(properties)
-    return self:addDrawing(DRAW_TYPES.BOX_3D, properties)
+function ESP:createBox3D(properties, PreExistingDrawing)
+    return self:addDrawing(DRAW_TYPES.BOX_3D, properties, PreExistingDrawing)
 end
 
 -- Create 2D rectangle
-function ESP:createRect2D(properties)
-    return self:addDrawing(DRAW_TYPES.RECT_2D, properties)
+function ESP:createRect2D(properties, PreExistingDrawing)
+    return self:addDrawing(DRAW_TYPES.RECT_2D, properties, PreExistingDrawing)
 end
 
 -- Create 3D rectangle
-function ESP:createRect3D(properties)
-    return self:addDrawing(DRAW_TYPES.RECT_3D, properties)
+function ESP:createRect3D(properties, PreExistingDrawing)
+    return self:addDrawing(DRAW_TYPES.RECT_3D, properties, PreExistingDrawing)
 end
 
 -- Create 2D circle
-function ESP:createCircle2D(properties)
-    return self:addDrawing(DRAW_TYPES.CIRCLE_2D, properties)
+function ESP:createCircle2D(properties, PreExistingDrawing)
+    return self:addDrawing(DRAW_TYPES.CIRCLE_2D, properties, PreExistingDrawing)
 end
 
 -- Create 3D circle
-function ESP:createCircle3D(properties)
-    return self:addDrawing(DRAW_TYPES.CIRCLE_3D, properties)
+function ESP:createCircle3D(properties, PreExistingDrawing)
+    return self:addDrawing(DRAW_TYPES.CIRCLE_3D, properties, PreExistingDrawing)
 end
 
 -- Create 2D line
-function ESP:createLine2D(properties)
-    return self:addDrawing(DRAW_TYPES.LINE_2D, properties)
+function ESP:createLine2D(properties, PreExistingDrawing)
+    return self:addDrawing(DRAW_TYPES.LINE_2D, properties, PreExistingDrawing)
 end
 
 -- Create 3D line
-function ESP:createLine3D(properties)
-    return self:addDrawing(DRAW_TYPES.LINE_3D, properties)
+function ESP:createLine3D(properties, PreExistingDrawing)
+    return self:addDrawing(DRAW_TYPES.LINE_3D, properties, PreExistingDrawing)
 end
 
 -- Create text box
-function ESP:createText(properties)
-    return self:addDrawing(DRAW_TYPES.TEXT, properties)
+function ESP:createText(properties, PreExistingDrawing)
+    return self:addDrawing(DRAW_TYPES.TEXT, properties, PreExistingDrawing)
+end
+
+ESP.recursiveDestroyDrawings = nil
+function ESP.recursiveDestroyDrawings(self, PreExistingDrawingInstances)
+    if not PreExistingDrawingInstances then
+        return
+    end
+    if type(PreExistingDrawingInstances) == "table" then
+        for i, v in pairs(PreExistingDrawingInstances) do
+            self:recursiveDestroyDrawings(v)
+        end
+    elseif typeof(PreExistingDrawingInstances) == "DrawingObject" then
+        PreExistingDrawingInstances:Destroy()
+    end
 end
 
 -- Clear all drawings
