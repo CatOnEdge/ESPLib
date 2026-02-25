@@ -351,7 +351,6 @@ function CreateDrawing(drawType, properties)
         color = properties.color or Color3.new(1,1,1);
         tracer = properties.tracer or nil;
         data = properties.data or {};
-        drawingObjects = {};
     }
     
     -- Tracer configuration
@@ -378,7 +377,7 @@ function CreateDrawing(drawType, properties)
 
         if drawing.visible then
             -- Draw visible faces
-            for i, face in ipairs(BOX_3D_FACES) do
+            for _, face in ipairs(BOX_3D_FACES) do
                 local A = ScreenPoints[face[1]]
                 local B = ScreenPoints[face[2]]
                 local C = ScreenPoints[face[3]]
@@ -401,10 +400,9 @@ function CreateDrawing(drawType, properties)
                         Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
                         Thickness = 1;
                     })
-                    drawing.drawingObjects["Main"..tostring(i)] = Main
                 end
             end
-            for i, edge in ipairs(BOX_3D_EDGES) do
+            for _, edge in ipairs(BOX_3D_EDGES) do
                 local A = ScreenPoints[edge[1]]
                 local B = ScreenPoints[edge[2]]
                 -- Outline Line
@@ -419,7 +417,6 @@ function CreateDrawing(drawType, properties)
                     To = B;
                     Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
                 })
-                drawing.drawingObjects["Outline"..tostring(i)] = Outline
             end
         end
     elseif drawing.type == DRAW_TYPES.RECT_2D then
@@ -463,8 +460,6 @@ function CreateDrawing(drawType, properties)
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
                 Filled = false;
             })
-            drawing.drawingObjects["Main"] = Main
-            drawing.drawingObjects["Outline"] = Outline
         end
     elseif drawing.type == DRAW_TYPES.RECT_3D then
         local QuadCorners = drawing.data.ScreenPoints
@@ -507,8 +502,6 @@ function CreateDrawing(drawType, properties)
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
                 Filled = false;
             })
-            drawing.drawingObjects["Main"] = Main
-            drawing.drawingObjects["Outline"] = Outline
         end
     elseif drawing.type == DRAW_TYPES.CIRCLE_2D then
         local Pos = drawing.data.CenterPos
@@ -544,8 +537,6 @@ function CreateDrawing(drawType, properties)
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
                 Filled = false
             })
-            drawing.drawingObjects["Main"] = Main
-            drawing.drawingObjects["Outline"] = Outline
         end
 
         ScreenPoints = {
@@ -587,7 +578,6 @@ function CreateDrawing(drawType, properties)
                     To = screen2;
                     Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
                 })
-                drawing.drawingObjects["line"..tostring(i)] = line
             end
         end
     elseif drawing.type == DRAW_TYPES.LINE_2D then
@@ -607,7 +597,6 @@ function CreateDrawing(drawType, properties)
                 To = Pos2;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
             })
-            drawing.drawingObjects["line"] = line
         end
 
         ScreenPoints = {Pos1, Pos2}
@@ -632,7 +621,6 @@ function CreateDrawing(drawType, properties)
                 To = screen2;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
             })
-            drawing.drawingObjects["line"] = line
         end
 
         ScreenPoints = {screen1, screen2}
@@ -653,7 +641,6 @@ function CreateDrawing(drawType, properties)
             DropText.OutlineColor = drawing.data.OutlineColor ~= nil and typeof(drawing.data.OutlineColor) == "Color3" and drawing.data.OutlineColor or Color3.new();
             DropText.Text = drawing.data.Text ~= nil and type(drawing.data.Text) == "string" and drawing.data.Text or "";
             DropText.Position = Pos;
-            drawing.drawingObjects["DropText"] = DropText
 
             ScreenPoints = {
                 Pos + Vector2.new(-DropText.TextBounds.X/2, -DropText.TextBounds.X/2);
@@ -708,8 +695,7 @@ function CreateDrawing(drawType, properties)
                 From = originPos;
                 To = targetPos;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
-            }, drawing.drawingObjects["Tracer"])
-            drawing.drawingObjects["Tracer"] = tracer
+            })
         end
     end
 
@@ -757,7 +743,7 @@ function ESP:createLine3D(properties)
     return self:addDrawing(DRAW_TYPES.LINE_3D, properties)
 end
 
--- Create text box
+-- Create text boxb
 function ESP:createText(properties)
     return self:addDrawing(DRAW_TYPES.TEXT, properties)
 end
@@ -769,6 +755,7 @@ end
 
 -- Render all visible drawings (calls user-defined render functions)
 function ESP:render(doDrawings)
+    self:clear()
     if doDrawings and type(doDrawings) == "function" then
         doDrawings()
     end
