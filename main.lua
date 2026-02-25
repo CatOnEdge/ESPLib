@@ -58,8 +58,8 @@ SELECTABLE_TRACER_TARGETS = ESP.SELECTABLE_TRACER_TARGETS or {
 }
 
 -- Helpers
-function AddDrawing(Type, Properties, PreExistingDrawing)
-    local Drawing = PreExistingDrawing or Drawing.new(Type)
+function AddDrawing(Type, Properties)
+    local Drawing = Drawing.new(Type)
     for Index, Property in pairs(Properties) do
         local success, err = pcall(function()
             Drawing[Index] = Property
@@ -342,7 +342,7 @@ genv.CountList = genv.CountList or function(list)
 end
 
 -- Drawing object constructor
-function CreateDrawing(drawType, properties, PreExistingDrawing)
+function CreateDrawing(drawType, properties)
     properties = properties or {}
     
     local drawing = {
@@ -351,7 +351,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
         color = properties.color or Color3.new(1,1,1);
         tracer = properties.tracer or nil;
         data = properties.data or {};
-        drawingObjects = PreExistingDrawing and PreExistingDrawing.drawingObjects or {};
+        drawingObjects = {};
     }
     
     -- Tracer configuration
@@ -400,7 +400,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                         PointD = D;
                         Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
                         Thickness = 1;
-                    }, drawing.drawingObjects["Main"..tostring(i)])
+                    })
                     drawing.drawingObjects["Main"..tostring(i)] = Main
                 end
             end
@@ -418,7 +418,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                     From = A;
                     To = B;
                     Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
-                }, drawing.drawingObjects["Outline"..tostring(i)])
+                })
                 drawing.drawingObjects["Outline"..tostring(i)] = Outline
             end
         end
@@ -447,7 +447,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                 PointD = ScreenPoints.BottomRight;
                 Thickness = 3;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
-            }, drawing.drawingObjects["Main"])
+            })
             -- Outline Quad
             local Outline = AddDrawing("Quad", {
                 --BaseDrawingObject
@@ -462,7 +462,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                 PointD = ScreenPoints.BottomRight;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
                 Filled = false;
-            }, drawing.drawingObjects["Outline"])
+            })
             drawing.drawingObjects["Main"] = Main
             drawing.drawingObjects["Outline"] = Outline
         end
@@ -491,7 +491,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                 PointD = ScreenPoints.BottomRight;
                 Thickness = 3;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
-            }, drawing.drawingObjects["Main"])
+            })
             -- Outline Quad
             local Outline = AddDrawing("Quad", {
                 --BaseDrawingObject
@@ -506,7 +506,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                 PointD = ScreenPoints.BottomRight;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
                 Filled = false;
-            }, drawing.drawingObjects["Outline"])
+            })
             drawing.drawingObjects["Main"] = Main
             drawing.drawingObjects["Outline"] = Outline
         end
@@ -529,7 +529,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                 Position = Pos;
                 Thickness = 3;
                 Filled = drawing.data.Filled ~= nil and type(drawing.data.Filled) == "boolean" and drawing.data.Filled or false;
-            }, drawing.drawingObjects["Main"])
+            })
             -- Outline Circle
             local Outline = AddDrawing("Circle", {
                 --BaseDrawingObject
@@ -543,7 +543,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                 Position = Pos;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
                 Filled = false
-            }, drawing.drawingObjects["Outline"])
+            })
             drawing.drawingObjects["Main"] = Main
             drawing.drawingObjects["Outline"] = Outline
         end
@@ -586,7 +586,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                     From = screen1;
                     To = screen2;
                     Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
-                }, drawing.drawingObjects["line"..tostring(i)])
+                })
                 drawing.drawingObjects["line"..tostring(i)] = line
             end
         end
@@ -606,7 +606,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                 From = Pos1;
                 To = Pos2;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
-            }, drawing.drawingObjects["line"])
+            })
             drawing.drawingObjects["line"] = line
         end
 
@@ -631,7 +631,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
                 From = screen1;
                 To = screen2;
                 Thickness = drawing.data.Thickness ~= nil and type(drawing.data.Thickness) == "number" and drawing.data.Thickness >= 0 and drawing.data.Thickness or 1;
-            }, drawing.drawingObjects["line"])
+            })
             drawing.drawingObjects["line"] = line
         end
 
@@ -641,7 +641,7 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
         assert(Pos and typeof(Pos) == "Vector2", "[ERROR] drawing.data.Pos must be a Vector2!")
 
         if drawing.visible then
-            local DropText = drawing.drawingObjects["DropText"] or Drawing.new("Text")
+            local DropText = Drawing.new("Text")
             DropText.Visible = true;
             DropText.Center = drawing.data.Center ~= nil and type(drawing.data.Center) == "boolean" and drawing.data.Center or true;
             DropText.Outline = drawing.data.Outline ~= nil and type(drawing.data.Outline) == "boolean" and drawing.data.Outline or true;
@@ -717,63 +717,49 @@ function CreateDrawing(drawType, properties, PreExistingDrawing)
 end
 
 -- Add drawing to library
-function ESP:addDrawing(drawType, properties, PreExistingDrawing)
-    local drawing = CreateDrawing(drawType, properties, PreExistingDrawing)
+function ESP:addDrawing(drawType, properties)
+    local drawing = CreateDrawing(drawType, properties)
     return drawing
 end
 
 -- Create 3D box
-function ESP:createBox3D(properties, PreExistingDrawing)
-    return self:addDrawing(DRAW_TYPES.BOX_3D, properties, PreExistingDrawing)
+function ESP:createBox3D(properties)
+    return self:addDrawing(DRAW_TYPES.BOX_3D, properties)
 end
 
 -- Create 2D rectangle
-function ESP:createRect2D(properties, PreExistingDrawing)
-    return self:addDrawing(DRAW_TYPES.RECT_2D, properties, PreExistingDrawing)
+function ESP:createRect2D(properties)
+    return self:addDrawing(DRAW_TYPES.RECT_2D, properties)
 end
 
 -- Create 3D rectangle
-function ESP:createRect3D(properties, PreExistingDrawing)
-    return self:addDrawing(DRAW_TYPES.RECT_3D, properties, PreExistingDrawing)
+function ESP:createRect3D(properties)
+    return self:addDrawing(DRAW_TYPES.RECT_3D, properties)
 end
 
 -- Create 2D circle
-function ESP:createCircle2D(properties, PreExistingDrawing)
-    return self:addDrawing(DRAW_TYPES.CIRCLE_2D, properties, PreExistingDrawing)
+function ESP:createCircle2D(properties)
+    return self:addDrawing(DRAW_TYPES.CIRCLE_2D, properties)
 end
 
 -- Create 3D circle
-function ESP:createCircle3D(properties, PreExistingDrawing)
-    return self:addDrawing(DRAW_TYPES.CIRCLE_3D, properties, PreExistingDrawing)
+function ESP:createCircle3D(properties)
+    return self:addDrawing(DRAW_TYPES.CIRCLE_3D, properties)
 end
 
 -- Create 2D line
-function ESP:createLine2D(properties, PreExistingDrawing)
-    return self:addDrawing(DRAW_TYPES.LINE_2D, properties, PreExistingDrawing)
+function ESP:createLine2D(properties)
+    return self:addDrawing(DRAW_TYPES.LINE_2D, properties)
 end
 
 -- Create 3D line
-function ESP:createLine3D(properties, PreExistingDrawing)
-    return self:addDrawing(DRAW_TYPES.LINE_3D, properties, PreExistingDrawing)
+function ESP:createLine3D(properties)
+    return self:addDrawing(DRAW_TYPES.LINE_3D, properties)
 end
 
 -- Create text box
-function ESP:createText(properties, PreExistingDrawing)
-    return self:addDrawing(DRAW_TYPES.TEXT, properties, PreExistingDrawing)
-end
-
-ESP.recursiveDestroyDrawings = nil
-function ESP.recursiveDestroyDrawings(self, PreExistingDrawingInstances)
-    if not PreExistingDrawingInstances then
-        return
-    end
-    if type(PreExistingDrawingInstances) == "table" then
-        for i, v in pairs(PreExistingDrawingInstances) do
-            self:recursiveDestroyDrawings(v)
-        end
-    elseif typeof(PreExistingDrawingInstances) == "DrawingObject" then
-        PreExistingDrawingInstances:Destroy()
-    end
+function ESP:createText(properties)
+    return self:addDrawing(DRAW_TYPES.TEXT, properties)
 end
 
 -- Clear all drawings
