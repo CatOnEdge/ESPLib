@@ -1,4 +1,4 @@
--- ESP 404 Library
+-- ESP Library
 -- Provides a framework for managing and rendering 3D ESP drawings with tracers
 
 -- This is more of a drawing library than an ESP library since ESPs really depends
